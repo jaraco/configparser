@@ -479,9 +479,8 @@ boolean {0[0]} NO
         L = [section for section in cf]
         L.sort()
         eq = self.assertEqual
-        elem_eq = self.assertCountEqual
         eq(L, sorted(["A", "B", self.default_section, "a"]))
-        eq(cf["a"].keys(), {"b"})
+        eq(cf["a"].keys(), ["b"])
         eq(cf["a"]["b"], "value",
            "could not locate option, expecting case-insensitive option names")
         with self.assertRaises(KeyError):
@@ -493,16 +492,16 @@ boolean {0[0]} NO
             self.assertTrue(
                 opt in cf["A"],
                 "has_option() returned false for option which should exist")
-        eq(cf["A"].keys(), {"a-b"})
-        eq(cf["a"].keys(), {"b"})
+        eq(cf["A"].keys(), ["a-b"])
+        eq(cf["a"].keys(), ["b"])
         del cf["a"]["B"]
-        elem_eq(cf["a"].keys(), {})
+        eq(len(cf["a"].keys()), 0)
 
         # SF bug #432369:
         cf = self.fromstring(
             "[MySection]\nOption{} first line   \n\tsecond line   \n".format(
                 self.delimiters[0]))
-        eq(cf["MySection"].keys(), {"option"})
+        eq(cf["MySection"].keys(), ["option"])
         eq(cf["MySection"]["Option"], "first line\nsecond line")
 
         # SF bug #561822:
@@ -615,7 +614,7 @@ boolean {0[0]} NO
         with self.assertRaises(configparser.DuplicateSectionError) as cm:
             cf.add_section("Foo")
         e = cm.exception
-        self.assertEqual(str(e), "Section 'Foo' already exists")
+        self.assertEqual(str(e), "Section u'Foo' already exists")
         self.assertEqual(e.args, ("Foo", None, None))
 
         if self.strict:
@@ -630,14 +629,14 @@ boolean {0[0]} NO
                 """.format(equals=self.delimiters[0])), source='<foo-bar>')
             e = cm.exception
             self.assertEqual(str(e), "While reading from <foo-bar> [line  5]: "
-                                     "section 'Foo' already exists")
+                                     "section u'Foo' already exists")
             self.assertEqual(e.args, ("Foo", '<foo-bar>', 5))
 
             with self.assertRaises(configparser.DuplicateOptionError) as cm:
                 cf.read_dict({'Bar': {'opt': 'val', 'OPT': 'is really `opt`'}})
             e = cm.exception
-            self.assertEqual(str(e), "While reading from <dict>: option 'opt' "
-                                     "in section 'Bar' already exists")
+            self.assertEqual(str(e), "While reading from <dict>: option u'opt' "
+                                     "in section u'Bar' already exists")
             self.assertEqual(e.args, ("Bar", "opt", "<dict>", None))
 
     def test_write(self):
@@ -1402,7 +1401,7 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         self.assertEqual(error.source, None)
         self.assertEqual(error.lineno, None)
         self.assertEqual(error.args, ('section', 'option', None, None))
-        self.assertEqual(str(error), "Option 'option' in section 'section' "
+        self.assertEqual(str(error), "Option u'option' in section u'section' "
                                      "already exists")
 
     def test_interpolation_depth_error(self):
@@ -1442,11 +1441,11 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
             parser['section']['invalid_percent']
         self.assertEqual(str(cm.exception), "'%' must be followed by '%' or "
-                                            "'(', found: '%'")
+                                            "'(', found: u'%'")
         with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
             parser['section']['invalid_reference']
         self.assertEqual(str(cm.exception), "bad interpolation variable "
-                                            "reference '%(()'")
+                                            "reference u'%(()'")
 
     def test_readfp_deprecation(self):
         sio = io.StringIO("""
