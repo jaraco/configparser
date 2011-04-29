@@ -1474,8 +1474,9 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         """)
         self.assertEqual(repr(parser['section']), '<Section: section>')
 
-def test_main():
-    support.run_unittest(
+def load_tests(loader, tests, pattern):
+    suite = unittest.TestSuite()
+    test_cases = (
         ConfigParserTestCase,
         ConfigParserTestCaseNonStandardDelimiters,
         ConfigParserTestCaseNoValue,
@@ -1496,3 +1497,6 @@ def test_main():
         ReadFileTestCase,
         CoverageOneHundredTestCase,
         )
+    for case in test_cases:
+        suite.addTests(loader.loadTestsFromTestCase(case))
+    return suite
