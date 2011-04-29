@@ -32,8 +32,8 @@ class TestChainMap(unittest.TestCase):
         for k, v in dict(a=1, b=2, c=30, z=100).items():              # check get
             self.assertEqual(d.get(k, 100), v)
         self.assertIn(repr(d), [                                      # check repr
-            type(d).__name__ + "({'c': 30}, {'a': 1, 'b': 2})",
-            type(d).__name__ + "({'c': 30}, {'b': 2, 'a': 1})"
+            type(d).__name__ + "({u'c': 30}, {u'a': 1, u'b': 2})",
+            type(d).__name__ + "({u'c': 30}, {u'b': 2, u'a': 1})"
         ])
 
         for e in d.copy(), copy.copy(d):                               # check shallow copies
