@@ -119,13 +119,15 @@ ConfigParser -- responsible for parsing a list of
         between keys and values are surrounded by spaces.
 """
 
-from collections import MutableMapping, OrderedDict as _default_dict, _ChainMap
+from collections import MutableMapping, OrderedDict as _default_dict
 import functools
 import io
 import itertools
 import re
 import sys
 import warnings
+
+from configparser_helpers import _ChainMap
 
 __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
            "NoOptionError", "InterpolationError", "InterpolationDepthError",
