@@ -19,7 +19,7 @@ fix_imports.MAPPING['configparser'] = 'configparser'
 fixers = ('annotations', 'bitlength', 'bool', 'bytes', 'classdecorator',
     'collections', 'dctsetcomp', 'division', 'except', 'features',
     'fullargspec', 'funcattrs', 'getcwd', 'imports', 'imports2', 'input',
-    'intern', 'itertools', 'kwargs', 'memoryview', 'metaclass', 'methodattrs',
+    'intern', 'kwargs', 'memoryview', 'metaclass', 'methodattrs',
     'newstyle', 'next', 'numliterals', 'open', 'print', 'printfunction',
     'raise', 'range', 'reduce', 'setliteral', 'str', 'super', 'throw',
     'unittest', 'unpacking', 'with')
