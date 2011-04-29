@@ -840,7 +840,7 @@ class RawConfigParser(MutableMapping):
         The section DEFAULT is special.
         """
         if section is _UNSET:
-            return super().items()
+            return super(RawConfigParser, self).items()
         d = self._defaults.copy()
         try:
             d.update(self._sections[section])
@@ -1162,21 +1162,21 @@ class ConfigParser(RawConfigParser):
         """Set an option.  Extends RawConfigParser.set by validating type and
         interpolation syntax on the value."""
         self._validate_value_types(option=option, value=value)
-        super().set(section, option, value)
+        super(ConfigParser, self).set(section, option, value)
 
     def add_section(self, section):
         """Create a new section in the configuration.  Extends
         RawConfigParser.add_section by validating if the section name is
         a string."""
         self._validate_value_types(section=section)
-        super().add_section(section)
+        super(ConfigParser, self).add_section(section)
 
 
 class SafeConfigParser(ConfigParser):
     """ConfigParser alias for backwards compatibility purposes."""
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(SafeConfigParser, self).__init__(*args, **kwargs)
         warnings.warn(
             "The SafeConfigParser class has been renamed to ConfigParser "
             "in Python 3.2. This alias will be removed in future versions."
