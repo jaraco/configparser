@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 """Configuration file parser.
 
 A configuration file consists of sections, lead by a "[section]" header,
