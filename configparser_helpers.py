@@ -3,9 +3,12 @@
 
 from collections import MutableMapping
 try:
-    from _thread import get_ident
+    from thread import get_ident
 except ImportError:
-    from _dummy_thread import get_ident
+    try:
+        from _thread import get_ident
+    except ImportError:
+        from _dummy_thread import get_ident
 
 # from reprlib 3.2.1
 def recursive_repr(fillvalue='...'):
