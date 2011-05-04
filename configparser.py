@@ -1144,13 +1144,15 @@ class RawConfigParser(MutableMapping):
         for RawConfigParsers. It is invoked in every case for mapping protocol
         access and in ConfigParser.set().
         """
-        if not isinstance(section, str):
+        if not isinstance(section, basestring):
             raise TypeError("section names must be strings")
-        if not isinstance(option, str):
+        if not isinstance(option, basestring):
             raise TypeError("option keys must be strings")
         if not self._allow_no_value or value:
-            if not isinstance(value, str):
+            if not isinstance(value, basestring):
                 raise TypeError("option values must be strings")
+        return (unicode(section), unicode(option), (value if value is None
+            else unicode(value)))
 
 
 class ConfigParser(RawConfigParser):
@@ -1161,14 +1163,14 @@ class ConfigParser(RawConfigParser):
     def set(self, section, option, value=None):
         """Set an option.  Extends RawConfigParser.set by validating type and
         interpolation syntax on the value."""
-        self._validate_value_types(option=option, value=value)
+        _, option, value = self._validate_value_types(option=option, value=value)
         super(ConfigParser, self).set(section, option, value)
 
     def add_section(self, section):
         """Create a new section in the configuration.  Extends
         RawConfigParser.add_section by validating if the section name is
         a string."""
-        self._validate_value_types(section=section)
+        section, _, _ = self._validate_value_types(section=section)
         super(ConfigParser, self).add_section(section)
 
 
@@ -1202,7 +1204,7 @@ class SectionProxy(MutableMapping):
         return self._parser.get(self._name, key)
 
     def __setitem__(self, key, value):
-        self._parser._validate_value_types(option=key, value=value)
+        _, key, value = self._parser._validate_value_types(option=key, value=value)
         return self._parser.set(self._name, key, value)
 
     def __delitem__(self, key):

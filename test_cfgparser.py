@@ -1476,6 +1476,119 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         """)
         self.assertEqual(repr(parser['section']), '<Section: section>')
 
+
+class UnicodeBackportTestCase(unittest.TestCase):
+    """Test for the backport to check if the Unicode coercion works."""
+
+    def test_unicode_none_old_style(self):
+        cp = configparser.ConfigParser(allow_no_value=True)
+        cp.add_section("section")
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp.set("section", "nothing", None)
+        self.assertIsAlright(cp, None)
+
+    def test_unicode_none_new_style(self):
+        cp = configparser.ConfigParser(allow_no_value=True)
+        cp["section"] = {}
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp["section"]["nothing"] = None
+        self.assertIsAlright(cp, None)
+
+    def test_unicode_none_new_style_one_step(self):
+        cp = configparser.ConfigParser(allow_no_value=True)
+        cp["section"] = {'nothing': None}
+        self.assertIsAlright(cp, None)
+
+    def test_unicode_unicode_old_style(self):
+        cp = configparser.ConfigParser()
+        cp.add_section("section")
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp.set("section", "nothing", "nada")
+        self.assertIsAlright(cp, "nada")
+
+    def test_unicode_unicode_new_style(self):
+        cp = configparser.ConfigParser()
+        cp["section"] = {}
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp["section"]["nothing"] = "nada"
+        self.assertIsAlright(cp, "nada")
+
+    def test_unicode_unicode_new_style_one_step(self):
+        cp = configparser.ConfigParser()
+        cp['section'] = {'nothing': 'nada'}
+        self.assertIsAlright(cp, 'nada')
+
+    def test_bytes_bytes_old_style(self):
+        cp = configparser.ConfigParser()
+        cp.add_section(b"section")
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp.set(b"section", b"nothing", b"nada")
+        self.assertIsAlright(cp, b"nada")
+
+    def test_bytes_bytes_new_style(self):
+        cp = configparser.ConfigParser()
+        cp[b"section"] = {}
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp[b"section"][b"nothing"] = b"nada"
+        self.assertIsAlright(cp, b"nada")
+
+    def test_bytes_bytes_new_style_one_step(self):
+        cp = configparser.ConfigParser()
+        cp[b'section'] = {b'nothing': b'nada'}
+        self.assertIsAlright(cp, b'nada')
+
+    def test_bytes_exceptions(self):
+        cp = configparser.ConfigParser()
+        cp[b'section'] = {b'nothing': b'nada'}
+        self.assertIsAlright(cp, b'nada')
+        with self.assertRaises(UnicodeDecodeError):
+            cp.add_section(b'łąka')
+        with self.assertRaises(UnicodeDecodeError):
+            cp[b'łąka'] = {}
+        with self.assertRaises(UnicodeDecodeError):
+            cp.set('section', b'łąka', b'value')
+        with self.assertRaises(UnicodeDecodeError):
+            cp['section'][b'łąka'] = b'value'
+        with self.assertRaises(UnicodeDecodeError):
+            cp['new'] = {b'łąka': b'value'}
+        with self.assertRaises(UnicodeDecodeError):
+            cp.set('section', b'key', b'łąka')
+        with self.assertRaises(UnicodeDecodeError):
+            cp['section'][b'key'] = b'łąka'
+        with self.assertRaises(UnicodeDecodeError):
+            cp['new'] = {b'key': b'łąka'}
+        # Unicode passes without exceptions
+        cp.add_section('łąka1')
+        cp['łąka2'] = {}
+        cp.set('section', 'łąka1', 'value')
+        cp['section']['łąka2'] = 'value'
+        cp['new'] = {'łąka': 'value'}
+        cp.set('section', 'key', 'łąka')
+        cp['section']['key'] = 'łąka'
+        cp['new'] = {'key': 'łąka'}
+
+    def assertIsAlright(self, cp, optvalue):
+        self.assertIn('section', cp)
+        self.assertIn('nothing', cp['section'])
+        self.assertIn('nothing', cp[b'section'])
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance(cp.options('section')[0], str)
+        self.assertIsInstance(cp.options(b'section')[0], str)
+        self.assertEqual(cp.get('section', 'nothing'), optvalue)
+        self.assertEqual(cp.get(b'section', b'nothing'), optvalue)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        self.assertIsInstance([opt for opt in cp['section']][0], str)
+        self.assertIsInstance([opt for opt in cp[b'section']][0], str)
+        self.assertEqual(cp['section']['nothing'], optvalue)
+        self.assertEqual(cp[b'section'][b'nothing'], optvalue)
+
+
 def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
     test_cases = (
@@ -1498,6 +1611,7 @@ def load_tests(loader, tests, pattern):
         ConfigParserTestCaseNonStandardDefaultSection,
         ReadFileTestCase,
         CoverageOneHundredTestCase,
+        UnicodeBackportTestCase,
         )
     for case in test_cases:
         suite.addTests(loader.loadTestsFromTestCase(case))
