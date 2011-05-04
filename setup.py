@@ -19,7 +19,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as ld_file:
 
 setup (
     name = 'configparser',
-    version = '3.2.0r1',
+    version = '3.2.0r2',
     author = u'Łukasz Langa',
     author_email = 'lukasz@langa.pl',
     description = __doc__,
