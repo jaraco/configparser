@@ -459,14 +459,14 @@ boolean {0[0]} NO
 
         # SF bug #432369:
         cf = self.fromstring(
-            "[MySection]\nOption{} first line   \n\tsecond line   \n".format(
+            "[MySection]\nOption{0} first line   \n\tsecond line   \n".format(
                 self.delimiters[0]))
         eq(cf.options("MySection"), ["option"])
         eq(cf.get("MySection", "Option"), "first line\nsecond line")
 
         # SF bug #561822:
         cf = self.fromstring("[section]\n"
-                             "nekey{}nevalue\n".format(self.delimiters[0]),
+                             "nekey{0}nevalue\n".format(self.delimiters[0]),
                              defaults={"key":"value"})
         self.assertTrue(cf.has_option("section", "Key"))
 
@@ -500,14 +500,14 @@ boolean {0[0]} NO
 
         # SF bug #432369:
         cf = self.fromstring(
-            "[MySection]\nOption{} first line   \n\tsecond line   \n".format(
+            "[MySection]\nOption{0} first line   \n\tsecond line   \n".format(
                 self.delimiters[0]))
         eq(cf["MySection"].keys(), {"option"})
         eq(cf["MySection"]["Option"], "first line\nsecond line")
 
         # SF bug #561822:
         cf = self.fromstring("[section]\n"
-                             "nekey{}nevalue\n".format(self.delimiters[0]),
+                             "nekey{0}nevalue\n".format(self.delimiters[0]),
                              defaults={"key":"value"})
         self.assertTrue("Key" in cf["section"])
 
@@ -525,10 +525,10 @@ boolean {0[0]} NO
         cf = self.newconfig()
         self.parse_error(cf, configparser.ParsingError,
                          "[Foo]\n"
-                         "{}val-without-opt-name\n".format(self.delimiters[0]))
+                         "{0}val-without-opt-name\n".format(self.delimiters[0]))
         self.parse_error(cf, configparser.ParsingError,
                          "[Foo]\n"
-                         "{}val-without-opt-name\n".format(self.delimiters[1]))
+                         "{0}val-without-opt-name\n".format(self.delimiters[1]))
         e = self.parse_error(cf, configparser.MissingSectionHeaderError,
                              "No Section!\n")
         self.assertEqual(e.args, ('<???>', 1, "No Section!\n"))
@@ -668,7 +668,7 @@ boolean {0[0]} NO
             cf.write(output, space_around_delimiters=space_around_delimiters)
             delimiter = self.delimiters[0]
             if space_around_delimiters:
-                delimiter = " {} ".format(delimiter)
+                delimiter = " {0} ".format(delimiter)
             expect_string = (
                 "[{default_section}]\n"
                 "foo{equals}another very\n"
@@ -942,10 +942,10 @@ class MultilineValuesTestCase(BasicTestCase):
     def setUp(self):
         cf = self.newconfig()
         for i in range(100):
-            s = 'section{}'.format(i)
+            s = 'section{0}'.format(i)
             cf.add_section(s)
             for j in range(10):
-                cf.set(s, 'lovely_spam{}'.format(j), self.wonderful_spam)
+                cf.set(s, 'lovely_spam{0}'.format(j), self.wonderful_spam)
         with open(support.TESTFN, 'w') as f:
             cf.write(f)
 

@@ -899,7 +899,7 @@ class RawConfigParser(MutableMapping):
         between keys and values are surrounded by spaces.
         """
         if space_around_delimiters:
-            d = " {} ".format(self._delimiters[0])
+            d = " {0} ".format(self._delimiters[0])
         else:
             d = self._delimiters[0]
         if self._defaults:
@@ -911,7 +911,7 @@ class RawConfigParser(MutableMapping):
 
     def _write_section(self, fp, section_name, section_items, delimiter):
         """Write a single section to the specified `fp'."""
-        fp.write("[{}]\n".format(section_name))
+        fp.write("[{0}]\n".format(section_name))
         for key, value in section_items:
             value = self._interpolation.before_write(self, section_name, key,
                                                      value)
@@ -919,7 +919,7 @@ class RawConfigParser(MutableMapping):
                 value = delimiter + str(value).replace('\n', '\n\t')
             else:
                 value = ""
-            fp.write("{}{}\n".format(key, value))
+            fp.write("{0}{1}\n".format(key, value))
         fp.write("\n")
 
     def remove_option(self, section, option):
@@ -1198,7 +1198,7 @@ class SectionProxy(MutableMapping):
         self._name = name
 
     def __repr__(self):
-        return '<Section: {}>'.format(self._name)
+        return '<Section: {0}>'.format(self._name)
 
     def __getitem__(self, key):
         if not self._parser.has_option(self._name, key):
