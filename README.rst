@@ -141,13 +141,17 @@ Change Log
 3.2.0r3
 ~~~~~~~
 
-* some healthy advertising in the README
+* proper Python 2.6 support
+
+  * explicitly stated the dependency on `ordereddict
+    <http://pypi.python.org/pypi/ordereddict>`_
+
+  * numbered all formatting braces in strings
 
 * explicitly says that Python 2.5 support won't happen (too much work necessary
-  without abstract base classes, the ``io`` library, etc.)
+  without abstract base classes, string formatters, the ``io`` library, etc.)
 
-* explicitly stated the dependency on `ordereddict
-  <http://pypi.python.org/pypi/ordereddict>`_ (unavailable in Python 2.6)
+* some healthy advertising in the README
 
 3.2.0r2
 ~~~~~~~
