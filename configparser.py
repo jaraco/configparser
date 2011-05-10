@@ -122,7 +122,11 @@ ConfigParser -- responsible for parsing a list of
         between keys and values are surrounded by spaces.
 """
 
-from collections import MutableMapping, OrderedDict as _default_dict
+from collections import MutableMapping
+try:
+    from collections import OrderedDict as _default_dict
+except ImportError:
+    from ordereddict import OrderedDict as _default_dict
 import functools
 import io
 import itertools
