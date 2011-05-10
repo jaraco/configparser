@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""This library brings the updated configparser from Python 3.2+ to Python 2.5-2.7."""
+"""This library brings the updated configparser from Python 3.2+ to Python 2.6-2.7."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -19,7 +19,7 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as ld_file:
 
 setup (
     name = 'configparser',
-    version = '3.2.0r2',
+    version = '3.2.0r3',
     author = u'Łukasz Langa',
     author_email = 'lukasz@langa.pl',
     description = __doc__,
@@ -31,6 +31,7 @@ setup (
     py_modules = ('configparser', 'configparser_helpers'),
     zip_safe = True,
     install_requires = [
+        'ordereddict',
         'unittest2',
     ],
     classifiers = [
@@ -41,7 +42,6 @@ setup (
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.5',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Topic :: Software Development :: Libraries',

@@ -4,7 +4,7 @@ configparser
 
 The ancient ``ConfigParser`` module available in the standard library 2.x has
 seen a major update in Python 3.2. This is a backport of those changes so that
-they can be used directly in Python 2.5 - 2.7.
+they can be used directly in Python 2.6 - 2.7.
 
 To use ``configparser`` instead of ``ConfigParser``, simply replace::
   
@@ -16,6 +16,95 @@ with::
 
 For detailed documentation consult the vanilla version at
 http://docs.python.org/py3k/library/configparser.html.
+
+Why you'll love ``configparser``
+--------------------------------
+
+Whereas almost completely compatible with its older brother, ``configparser``
+sports a bunch of interesting new features:
+
+* full mapping protocol access (`more info
+  <http://docs.python.org/py3k/library/configparser.html#mapping-protocol-access>`_)::
+
+    >>> parser = ConfigParser()
+    >>> parser.read_string("""
+    [DEFAULT]
+    location = upper left
+    visible = yes
+    editable = no
+    color = blue
+
+    [main]
+    title = Main Menu
+    color = green
+
+    [options]
+    title = Options
+    """)
+    >>> parser['main']['color']
+    'green'
+    >>> parser['main']['editable']
+    'no'
+    >>> section = parser['options']
+    >>> section['title']
+    'Options'
+    >>> section['title'] = 'Options (editable: %(editable)s)'
+    >>> section['title']
+    'Options (editable: no)'
+  
+* there's now one default ``ConfigParser`` class, which basically is the old
+  ``SafeConfigParser`` with a bunch of tweaks which make it more predictable for
+  users. Don't need interpolation? Simply use
+  ``ConfigParser(interpolation=None)``, no need to use a distinct
+  ``RawConfigParser`` anymore.
+
+* the parser is highly `customizable upon instantiation
+  <http://docs.python.org/py3k/library/configparser.html#customizing-parser-behaviour>`__
+  supporting things like changing option delimiters, comment characters, the
+  name of the DEFAULT section, the interpolation syntax, etc.
+
+* you can easily create your own interpolation syntax but there are two powerful
+  implementations built-in (`more info
+  <http://docs.python.org/py3k/library/configparser.html#interpolation-of-values>`__):
+
+  * the classic ``%(string-like)s`` syntax (called ``BasicInterpolation``)
+
+  * a new ``${buildout:like}`` syntax (called ``ExtendedInterpolation``)
+  
+* fallback values may be specified in getters (`more info
+  <http://docs.python.org/py3k/library/configparser.html#fallback-values>`__)::
+
+    >>> config.get('closet', 'monster',
+    ...            fallback='No such things as monsters')
+    'No such things as monsters'
+  
+* ``ConfigParser`` objects can now read data directly `from strings
+  <http://docs.python.org/py3k/library/configparser.html#configparser.ConfigParser.read_string>`__
+  and `from dictionaries
+  <http://docs.python.org/py3k/library/configparser.html#configparser.ConfigParser.read_dict>`__.
+  That means importing configuration from JSON or specifying default values for
+  the whole configuration (multiple sections) is now a single line of code. Same
+  goes for copying data from another ``ConfigParser`` instance, thanks to its
+  mapping protocol support. 
+
+* many smaller tweaks, updates and fixes
+
+A few words about Unicode
+-------------------------
+
+``configparser`` comes from Python 3 and as such it works well with Unicode.
+The library is generally cleaned up in terms of internal data storage and
+reading/writing files.  There are a couple of incompatibilities with the old
+``ConfigParser`` due to that. However, the work required to migrate is well
+worth it as it shows the issues that would likely come up during migration of
+your project to Python 3.
+
+The design assumes that Unicode strings are used whenever possible [1]_.  That
+gives you the certainty that what's stored in a configuration object is text.
+Once your configuration is read, the rest of your application doesn't have to
+deal with encoding issues. All you have is text [2]_. The only two phases when
+you should explicitly state encoding is when you either read from an external
+source (e.g. a file) or write back. 
 
 Versioning
 ----------
@@ -48,6 +137,17 @@ This backport is maintained on BitBucket by Łukasz Langa, the current vanilla
 
 Change Log
 ----------
+
+3.2.0r3
+~~~~~~~
+
+* some healthy advertising in the README
+
+* explicitly says that Python 2.5 support won't happen (too much work necessary
+  without abstract base classes, the ``io`` library, etc.)
+
+* explicitly stated the dependency on `ordereddict
+  <http://pypi.python.org/pypi/ordereddict>`_ (unavailable in Python 2.6)
 
 3.2.0r2
 ~~~~~~~
@@ -120,3 +220,30 @@ don't create nasty conflicts in the repository.
 
 This process works quite well but if you have any tips on how to make it simpler
 and faster, do enlighten me :)
+
+Footnotes
+---------
+
+.. [1] To somewhat ease migration, passing bytestrings is still supported but
+       they are converted to Unicode for internal storage anyway. This means
+       that for the vast majority of strings used in configuration files, it
+       won't matter if you pass them as bytestrings or Unicode. However, if you
+       pass a bytestring that cannot be converted to Unicode using the naive
+       ASCII codec, a ``UnicodeDecodeError`` will be raised. This is purposeful
+       and helps you manage proper encoding for all content you store in
+       memory, read from various sources and write back.
+
+.. [2] Life gets much easier when you understand that you basically manage
+       **text** in your application.  You don't care about bytes but about
+       letters.  In that regard the concept of content encoding is meaningless.
+       The only time when you deal with raw bytes is when you write the data to
+       a file.  Then you have to specify how your text should be encoded.  On
+       the other end, to get meaningful text from a file, the application
+       reading it has to know which encoding was used during its creation.  But
+       once the bytes are read and properly decoded, all you have is text.  This
+       is especially powerful when you start interacting with multiple data
+       sources.  Even if each of them uses a different encoding, inside your
+       application data is held in abstract text form.  You can program your
+       business logic without worrying about which data came from which source.
+       You can freely exchange the data you store between sources.  Only
+       reading/writing files requires encoding your text to bytes.
