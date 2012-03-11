@@ -131,9 +131,9 @@ Maintenance
 This backport is maintained on BitBucket by Łukasz Langa, the current vanilla
 ``configparser`` maintainer for CPython:
 
-* `configparser Mercurial repository <https://bitbucket.org/langacore/configparser>`_
+* `configparser Mercurial repository <https://bitbucket.org/ambv/configparser>`_
 
-* `configparser issue tracker <https://bitbucket.org/langacore/configparser/issues>`_ 
+* `configparser issue tracker <https://bitbucket.org/ambv/configparser/issues>`_ 
 
 Change Log
 ----------
