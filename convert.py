@@ -31,6 +31,6 @@ for fixer in fixers:
     args.append(fixer)
 
 args.extend(['-wn', '--no-diffs', 'configparser.py', 'configparser_helpers.py',
-    'test_cfgparser.py', 'test_helpers.py'])
+    'test_configparser.py', 'test_helpers.py'])
 
 sys.exit(main("lib3to2.fixes", args))
