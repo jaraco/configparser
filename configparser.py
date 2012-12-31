@@ -102,10 +102,9 @@ ConfigParser -- responsible for parsing a list of
         yes, on for True).  Returns False or True.
 
     items(section=_UNSET, raw=False, vars=None)
-        If section is given, return a list of tuples with (section_name,
-        section_proxy) for each section, including DEFAULTSECT. Otherwise,
-        return a list of tuples with (name, value) for each option
-        in the section.
+        If section is given, return a list of tuples with (name, value) for
+        each option in the section. Otherwise, return a list of tuples with
+        (section_name, section_proxy) for each section, including DEFAULTSECT.
 
     remove_section(section)
         Remove the given file section and all its options.
@@ -861,6 +860,19 @@ class RawConfigParser(MutableMapping):
             value_getter = lambda option: d[option]
         return [(option, value_getter(option)) for option in d.keys()]
 
+    def popitem(self):
+        """Remove a section from the parser and return it as
+        a (section_name, section_proxy) tuple. If no section is present, raise
+        KeyError.
+
+        The section DEFAULT is never returned because it cannot be removed.
+        """
+        for key in self.sections():
+            value = self[key]
+            del self[key]
+            return key, value
+        raise KeyError
+
     def optionxform(self, optionstr):
         return optionstr.lower()
 
@@ -956,7 +968,10 @@ class RawConfigParser(MutableMapping):
 
         # XXX this is not atomic if read_dict fails at any point. Then again,
         # no update method in configparser is atomic in this implementation.
-        self.remove_section(key)
+        if key == self.default_section:
+            self._defaults.clear()
+        else:
+            self.remove_section(key)
         self.read_dict({key: value})
 
     def __delitem__(self, key):
@@ -1001,18 +1016,26 @@ class RawConfigParser(MutableMapping):
         indent_level = 0
         e = None                              # None, or an exception
         for lineno, line in enumerate(fp, start=1):
-            comment_start = None
+            comment_start = sys.maxsize
             # strip inline comments
-            for prefix in self._inline_comment_prefixes:
-                index = line.find(prefix)
-                if index == 0 or (index > 0 and line[index-1].isspace()):
-                    comment_start = index
-                    break
+            inline_prefixes = {p: -1 for p in self._inline_comment_prefixes}
+            while comment_start == sys.maxsize and inline_prefixes:
+                next_prefixes = {}
+                for prefix, index in inline_prefixes.items():
+                    index = line.find(prefix, index+1)
+                    if index == -1:
+                        continue
+                    next_prefixes[prefix] = index
+                    if index == 0 or (index > 0 and line[index-1].isspace()):
+                        comment_start = min(comment_start, index)
+                inline_prefixes = next_prefixes
             # strip full line comments
             for prefix in self._comment_prefixes:
                 if line.strip().startswith(prefix):
                     comment_start = 0
                     break
+            if comment_start == sys.maxsize:
+                comment_start = None
             value = line[:comment_start].strip()
             if not value:
                 if self._empty_lines_in_values:

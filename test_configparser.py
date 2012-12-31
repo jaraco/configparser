@@ -773,6 +773,61 @@ boolean {0[0]} NO
         with self.assertRaises(configparser.NoSectionError):
             cf.items("no such section")
 
+    def test_popitem(self):
+        cf = self.fromstring("""
+            [section1]
+            name1 {0[0]} value1
+            [section2]
+            name2 {0[0]} value2
+            [section3]
+            name3 {0[0]} value3
+        """.format(self.delimiters), defaults={"default": "<default>"})
+        self.assertEqual(cf.popitem()[0], 'section1')
+        self.assertEqual(cf.popitem()[0], 'section2')
+        self.assertEqual(cf.popitem()[0], 'section3')
+        with self.assertRaises(KeyError):
+            cf.popitem()
+
+    def test_clear(self):
+        cf = self.newconfig({"foo": "Bar"})
+        self.assertEqual(
+            cf.get(self.default_section, "Foo"), "Bar",
+            "could not locate option, expecting case-insensitive option names")
+        cf['zing'] = {'option1': 'value1', 'option2': 'value2'}
+        self.assertEqual(cf.sections(), ['zing'])
+        self.assertEqual(set(cf['zing'].keys()), set(['option1', 'option2', 'foo']))
+        cf.clear()
+        self.assertEqual(set(cf.sections()), set())
+        self.assertEqual(set(cf[self.default_section].keys()), set(['foo']))
+
+    def test_setitem(self):
+        cf = self.fromstring("""
+            [section1]
+            name1 {0[0]} value1
+            [section2]
+            name2 {0[0]} value2
+            [section3]
+            name3 {0[0]} value3
+        """.format(self.delimiters), defaults={"nameD": "valueD"})
+        self.assertEqual(set(cf['section1'].keys()), set(['name1', 'named']))
+        self.assertEqual(set(cf['section2'].keys()), set(['name2', 'named']))
+        self.assertEqual(set(cf['section3'].keys()), set(['name3', 'named']))
+        self.assertEqual(cf['section1']['name1'], 'value1')
+        self.assertEqual(cf['section2']['name2'], 'value2')
+        self.assertEqual(cf['section3']['name3'], 'value3')
+        cf['section2'] = {'name22': 'value22'}
+        self.assertEqual(set(cf['section2'].keys()), set(['name22', 'named']))
+        self.assertEqual(cf['section2']['name22'], 'value22')
+        self.assertNotIn('name2', cf['section2'])
+        cf['section3'] = {}
+        self.assertEqual(set(cf['section3'].keys()), set(['named']))
+        self.assertNotIn('name3', cf['section3'])
+        cf[self.default_section] = {}
+        self.assertEqual(set(cf[self.default_section].keys()), set())
+        self.assertEqual(set(cf['section1'].keys()), set(['name1']))
+        self.assertEqual(set(cf['section2'].keys()), set(['name22']))
+        self.assertEqual(set(cf['section3'].keys()), set())
+
 
 class StrictTestCase(BasicTestCase):
     config_class = configparser.RawConfigParser
@@ -1477,6 +1532,186 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         """)
         self.assertEqual(repr(parser['section']), '<Section: section>')
 
+
+class ExceptionPicklingTestCase(unittest.TestCase):
+    """Tests for issue #13760: ConfigParser exceptions are not picklable."""
+
+    def test_error(self):
+        import pickle
+        e1 = configparser.Error('value')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_nosectionerror(self):
+        import pickle
+        e1 = configparser.NoSectionError('section')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_nooptionerror(self):
+        import pickle
+        e1 = configparser.NoOptionError('option', 'section')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(e1.option, e2.option)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_duplicatesectionerror(self):
+        import pickle
+        e1 = configparser.DuplicateSectionError('section', 'source', 123)
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(e1.source, e2.source)
+        self.assertEqual(e1.lineno, e2.lineno)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_duplicateoptionerror(self):
+        import pickle
+        e1 = configparser.DuplicateOptionError('section', 'option', 'source',
+            123)
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(e1.option, e2.option)
+        self.assertEqual(e1.source, e2.source)
+        self.assertEqual(e1.lineno, e2.lineno)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_interpolationerror(self):
+        import pickle
+        e1 = configparser.InterpolationError('option', 'section', 'msg')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(e1.option, e2.option)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_interpolationmissingoptionerror(self):
+        import pickle
+        e1 = configparser.InterpolationMissingOptionError('option', 'section',
+            'rawval', 'reference')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(e1.option, e2.option)
+        self.assertEqual(e1.reference, e2.reference)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_interpolationsyntaxerror(self):
+        import pickle
+        e1 = configparser.InterpolationSyntaxError('option', 'section', 'msg')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(e1.option, e2.option)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_interpolationdeptherror(self):
+        import pickle
+        e1 = configparser.InterpolationDepthError('option', 'section',
+            'rawval')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.section, e2.section)
+        self.assertEqual(e1.option, e2.option)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_parsingerror(self):
+        import pickle
+        e1 = configparser.ParsingError('source')
+        e1.append(1, 'line1')
+        e1.append(2, 'line2')
+        e1.append(3, 'line3')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.source, e2.source)
+        self.assertEqual(e1.errors, e2.errors)
+        self.assertEqual(repr(e1), repr(e2))
+        e1 = configparser.ParsingError(filename='filename')
+        e1.append(1, 'line1')
+        e1.append(2, 'line2')
+        e1.append(3, 'line3')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.source, e2.source)
+        self.assertEqual(e1.errors, e2.errors)
+        self.assertEqual(repr(e1), repr(e2))
+
+    def test_missingsectionheadererror(self):
+        import pickle
+        e1 = configparser.MissingSectionHeaderError('filename', 123, 'line')
+        pickled = pickle.dumps(e1)
+        e2 = pickle.loads(pickled)
+        self.assertEqual(e1.message, e2.message)
+        self.assertEqual(e1.args, e2.args)
+        self.assertEqual(e1.line, e2.line)
+        self.assertEqual(e1.source, e2.source)
+        self.assertEqual(e1.lineno, e2.lineno)
+        self.assertEqual(repr(e1), repr(e2))
+
+
+class InlineCommentStrippingTestCase(unittest.TestCase):
+    """Tests for issue #14590: ConfigParser doesn't strip inline comment when
+    delimiter occurs earlier without preceding space.."""
+
+    def test_stripping(self):
+        cfg = configparser.ConfigParser(inline_comment_prefixes=(';', '#',
+                '//'))
+        cfg.read_string("""
+        [section]
+        k1 = v1;still v1
+        k2 = v2 ;a comment
+        k3 = v3 ; also a comment
+        k4 = v4;still v4 ;a comment
+        k5 = v5;still v5 ; also a comment
+        k6 = v6;still v6; and still v6 ;a comment
+        k7 = v7;still v7; and still v7 ; also a comment
+
+        [multiprefix]
+        k1 = v1;still v1 #a comment ; yeah, pretty much
+        k2 = v2 // this already is a comment ; continued
+        k3 = v3;#//still v3# and still v3 ; a comment
+        """)
+        s = cfg['section']
+        self.assertEqual(s['k1'], 'v1;still v1')
+        self.assertEqual(s['k2'], 'v2')
+        self.assertEqual(s['k3'], 'v3')
+        self.assertEqual(s['k4'], 'v4;still v4')
+        self.assertEqual(s['k5'], 'v5;still v5')
+        self.assertEqual(s['k6'], 'v6;still v6; and still v6')
+        self.assertEqual(s['k7'], 'v7;still v7; and still v7')
+        s = cfg['multiprefix']
+        self.assertEqual(s['k1'], 'v1;still v1')
+        self.assertEqual(s['k2'], 'v2')
+        self.assertEqual(s['k3'], 'v3;#//still v3# and still v3')
+
+
 def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
     test_cases = (
@@ -1499,6 +1734,8 @@ def load_tests(loader, tests, pattern):
         ConfigParserTestCaseNonStandardDefaultSection,
         ReadFileTestCase,
         CoverageOneHundredTestCase,
+        ExceptionPicklingTestCase,
+        InlineCommentStrippingTestCase,
         )
     for case in test_cases:
         suite.addTests(loader.loadTestsFromTestCase(case))
