@@ -145,6 +145,10 @@ Change Log
   <http://bugs.python.org/issue15803>`_ and `#16820
   <http://bugs.python.org/issue16820>`_
 
+* fixes `BitBucket issue #4
+  <https://bitbucket.org/ambv/configparser/issue/4>`_: ``read()`` properly
+  treats a bytestring argument as a filename
+
 * `ordereddict <http://pypi.python.org/pypi/ordereddict>`_ dependency required
   only for Python 2.6
 
