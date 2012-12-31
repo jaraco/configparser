@@ -688,7 +688,7 @@ class RawConfigParser(MutableMapping):
 
         Return list of successfully read files.
         """
-        if isinstance(filenames, str):
+        if isinstance(filenames, basestring):
             filenames = [filenames]
         read_ok = []
         for filename in filenames:
