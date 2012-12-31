@@ -15,7 +15,7 @@ with::
   import configparser
 
 For detailed documentation consult the vanilla version at
-http://docs.python.org/py3k/library/configparser.html.
+http://docs.python.org/3/library/configparser.html.
 
 Why you'll love ``configparser``
 --------------------------------
@@ -24,7 +24,7 @@ Whereas almost completely compatible with its older brother, ``configparser``
 sports a bunch of interesting new features:
 
 * full mapping protocol access (`more info
-  <http://docs.python.org/py3k/library/configparser.html#mapping-protocol-access>`_)::
+  <http://docs.python.org/3/library/configparser.html#mapping-protocol-access>`_)::
 
     >>> parser = ConfigParser()
     >>> parser.read_string("""
@@ -59,29 +59,29 @@ sports a bunch of interesting new features:
   ``RawConfigParser`` anymore.
 
 * the parser is highly `customizable upon instantiation
-  <http://docs.python.org/py3k/library/configparser.html#customizing-parser-behaviour>`__
+  <http://docs.python.org/3/library/configparser.html#customizing-parser-behaviour>`__
   supporting things like changing option delimiters, comment characters, the
   name of the DEFAULT section, the interpolation syntax, etc.
 
 * you can easily create your own interpolation syntax but there are two powerful
   implementations built-in (`more info
-  <http://docs.python.org/py3k/library/configparser.html#interpolation-of-values>`__):
+  <http://docs.python.org/3/library/configparser.html#interpolation-of-values>`__):
 
   * the classic ``%(string-like)s`` syntax (called ``BasicInterpolation``)
 
   * a new ``${buildout:like}`` syntax (called ``ExtendedInterpolation``)
   
 * fallback values may be specified in getters (`more info
-  <http://docs.python.org/py3k/library/configparser.html#fallback-values>`__)::
+  <http://docs.python.org/3/library/configparser.html#fallback-values>`__)::
 
     >>> config.get('closet', 'monster',
     ...            fallback='No such things as monsters')
     'No such things as monsters'
   
 * ``ConfigParser`` objects can now read data directly `from strings
-  <http://docs.python.org/py3k/library/configparser.html#configparser.ConfigParser.read_string>`__
+  <http://docs.python.org/3/library/configparser.html#configparser.ConfigParser.read_string>`__
   and `from dictionaries
-  <http://docs.python.org/py3k/library/configparser.html#configparser.ConfigParser.read_dict>`__.
+  <http://docs.python.org/3/library/configparser.html#configparser.ConfigParser.read_dict>`__.
   That means importing configuration from JSON or specifying default values for
   the whole configuration (multiple sections) is now a single line of code. Same
   goes for copying data from another ``ConfigParser`` instance, thanks to its
@@ -137,6 +137,19 @@ This backport is maintained on BitBucket by Łukasz Langa, the current vanilla
 
 Change Log
 ----------
+
+3.3.0r1
+~~~~~~~
+
+* compatible with 3.3.0 + fixes for `#15803
+  <http://bugs.python.org/issue15803>`_ and `#16820
+  <http://bugs.python.org/issue16820>`_
+
+* `ordereddict <http://pypi.python.org/pypi/ordereddict>`_ dependency required
+  only for Python 2.6
+
+* `unittest2 <http://pypi.python.org/pypi/unittest2>`_ explicit dependency
+  dropped. If you want to test the release, add ``unittest2`` on your own.
 
 3.2.0r3
 ~~~~~~~
