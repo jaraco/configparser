@@ -138,6 +138,12 @@ This backport is maintained on BitBucket by Łukasz Langa, the current vanilla
 Change Log
 ----------
 
+3.3.0r2
+~~~~~~~
+
+* updated the fix for `#16820 <http://bugs.python.org/issue16820>`_: parsers
+  now preserve section order when using ``__setitem__`` and ``update``
+
 3.3.0r1
 ~~~~~~~
 

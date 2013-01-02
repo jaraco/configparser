@@ -23,12 +23,12 @@ if sys.version_info[:2] < (2, 7):
 
 setup (
     name = 'configparser',
-    version = '3.3.0r1',
+    version = '3.3.0r2',
     author = u'Łukasz Langa',
     author_email = 'lukasz@langa.pl',
     description = __doc__,
     long_description = long_description,
-    url = 'http://docs.python.org/py3k/library/configparser.html',
+    url = 'http://docs.python.org/3/library/configparser.html',
     keywords = 'configparser ini parsing conf cfg configuration file',
     platforms = ['any'],
     license = 'MIT',
