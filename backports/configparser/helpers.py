@@ -10,6 +10,10 @@ except ImportError:
     except ImportError:
         from _dummy_thread import get_ident
 
+
+from future.backports.misc import OrderedDict
+
+
 # from reprlib 3.2.1
 def recursive_repr(fillvalue='...'):
     'Decorator to make a repr function return fillvalue for a recursive call'
@@ -132,3 +136,9 @@ class _ChainMap(MutableMapping):
     def clear(self):
         'Clear maps[0], leaving maps[1:] intact.'
         self.maps[0].clear()
+
+
+try:
+    from collections import ChainMap
+except ImportError:
+    ChainMap = _ChainMap

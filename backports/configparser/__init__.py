@@ -122,10 +122,6 @@ ConfigParser -- responsible for parsing a list of
 """
 
 from collections import MutableMapping
-try:
-    from collections import OrderedDict as _default_dict
-except ImportError:
-    from ordereddict import OrderedDict as _default_dict
 import functools
 import io
 import itertools
@@ -133,7 +129,8 @@ import re
 import sys
 import warnings
 
-from backports.configparser.helpers import _ChainMap
+from backports.configparser.helpers import OrderedDict as _default_dict
+from backports.configparser.helpers import ChainMap as _ChainMap
 
 __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
            "NoOptionError", "InterpolationError", "InterpolationDepthError",
