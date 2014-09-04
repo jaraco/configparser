@@ -121,6 +121,11 @@ ConfigParser -- responsible for parsing a list of
         between keys and values are surrounded by spaces.
 """
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from collections import MutableMapping
 import functools
 import io
@@ -131,6 +136,7 @@ import warnings
 
 from backports.configparser.helpers import OrderedDict as _default_dict
 from backports.configparser.helpers import ChainMap as _ChainMap
+from backports.configparser.helpers import str, PY2
 
 __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
            "NoOptionError", "InterpolationError", "InterpolationDepthError",
@@ -685,7 +691,19 @@ class RawConfigParser(MutableMapping):
 
         Return list of successfully read files.
         """
-        if isinstance(filenames, str):
+        if PY2 and isinstance(filenames, bytes):
+            # we allow for a little unholy magic for Python 2 so that
+            # people not using unicode_literals can still use the library
+            # conveniently
+            warnings.warn(
+                "You passed a bytestring as `filenames`. This will not work"
+                " on Python 3. Use `cp.read_file()` or switch to using Unicode"
+                " strings across the board.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            filenames = [filenames]
+        elif isinstance(filenames, str):
             filenames = [filenames]
         read_ok = []
         for filename in filenames:
@@ -840,7 +858,7 @@ class RawConfigParser(MutableMapping):
         The section DEFAULT is special.
         """
         if section is _UNSET:
-            return super().items()
+            return super(RawConfigParser, self).items()
         d = self._defaults.copy()
         try:
             d.update(self._sections[section])
@@ -1168,6 +1186,24 @@ class RawConfigParser(MutableMapping):
         for RawConfigParsers. It is invoked in every case for mapping protocol
         access and in ConfigParser.set().
         """
+        if PY2 and bytes in (type(section), type(option), type(value)):
+            # we allow for a little unholy magic for Python 2 so that
+            # people not using unicode_literals can still use the library
+            # conveniently
+            warnings.warn(
+                "You passed a bytestring. Implicitly decoding as UTF-8 string."
+                " This will not work on Python 3. Please switch to using"
+                " Unicode strings across the board.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            if isinstance(section, bytes):
+                section = section.decode('utf8')
+            if isinstance(option, bytes):
+                option = option.decode('utf8')
+            if isinstance(value, bytes):
+                value = value.decode('utf8')
+
         if not isinstance(section, str):
             raise TypeError("section names must be strings")
         if not isinstance(option, str):
@@ -1175,6 +1211,8 @@ class RawConfigParser(MutableMapping):
         if not self._allow_no_value or value:
             if not isinstance(value, str):
                 raise TypeError("option values must be strings")
+
+        return section, option, value
 
 
 class ConfigParser(RawConfigParser):
@@ -1185,22 +1223,22 @@ class ConfigParser(RawConfigParser):
     def set(self, section, option, value=None):
         """Set an option.  Extends RawConfigParser.set by validating type and
         interpolation syntax on the value."""
-        self._validate_value_types(option=option, value=value)
-        super().set(section, option, value)
+        _, option, value = self._validate_value_types(option=option, value=value)
+        super(ConfigParser, self).set(section, option, value)
 
     def add_section(self, section):
         """Create a new section in the configuration.  Extends
         RawConfigParser.add_section by validating if the section name is
         a string."""
-        self._validate_value_types(section=section)
-        super().add_section(section)
+        section, _, _ = self._validate_value_types(section=section)
+        super(ConfigParser, self).add_section(section)
 
 
 class SafeConfigParser(ConfigParser):
     """ConfigParser alias for backwards compatibility purposes."""
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(SafeConfigParser, self).__init__(*args, **kwargs)
         warnings.warn(
             "The SafeConfigParser class has been renamed to ConfigParser "
             "in Python 3.2. This alias will be removed in future versions."
@@ -1226,7 +1264,7 @@ class SectionProxy(MutableMapping):
         return self._parser.get(self._name, key)
 
     def __setitem__(self, key, value):
-        self._parser._validate_value_types(option=key, value=value)
+        _, key, value = self._parser._validate_value_types(option=key, value=value)
         return self._parser.set(self._name, key, value)
 
     def __delitem__(self, key):

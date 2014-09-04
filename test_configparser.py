@@ -1,16 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import collections
-import configparser
 import io
 import os
-import sys
 import textwrap
 import unittest
 import warnings
 
-from test import support
+try:
+    from test import support
+except ImportError:
+    from test import test_support as support
+
+from backports import configparser
+from backports.configparser.helpers import PY2
+
 
 class SortedDict(collections.UserDict):
 
@@ -479,9 +489,8 @@ boolean {0[0]} NO
         L = [section for section in cf]
         L.sort()
         eq = self.assertEqual
-        elem_eq = self.assertCountEqual
         eq(L, sorted(["A", "B", self.default_section, "a"]))
-        eq(cf["a"].keys(), {"b"})
+        eq(cf["a"].keys(), ["b"])
         eq(cf["a"]["b"], "value",
            "could not locate option, expecting case-insensitive option names")
         with self.assertRaises(KeyError):
@@ -493,16 +502,16 @@ boolean {0[0]} NO
             self.assertTrue(
                 opt in cf["A"],
                 "has_option() returned false for option which should exist")
-        eq(cf["A"].keys(), {"a-b"})
-        eq(cf["a"].keys(), {"b"})
+        eq(cf["A"].keys(), ["a-b"])
+        eq(cf["a"].keys(), ["b"])
         del cf["a"]["B"]
-        elem_eq(cf["a"].keys(), {})
+        eq(len(cf["a"].keys()), 0)
 
         # SF bug #432369:
         cf = self.fromstring(
             "[MySection]\nOption{0} first line   \n\tsecond line   \n".format(
                 self.delimiters[0]))
-        eq(cf["MySection"].keys(), {"option"})
+        eq(cf["MySection"].keys(), ["option"])
         eq(cf["MySection"]["Option"], "first line\nsecond line")
 
         # SF bug #561822:
@@ -615,7 +624,7 @@ boolean {0[0]} NO
         with self.assertRaises(configparser.DuplicateSectionError) as cm:
             cf.add_section("Foo")
         e = cm.exception
-        self.assertEqual(str(e), "Section 'Foo' already exists")
+        self.assertEqual(str(e), "Section {!r} already exists".format('Foo'))
         self.assertEqual(e.args, ("Foo", None, None))
 
         if self.strict:
@@ -630,14 +639,15 @@ boolean {0[0]} NO
                 """.format(equals=self.delimiters[0])), source='<foo-bar>')
             e = cm.exception
             self.assertEqual(str(e), "While reading from <foo-bar> [line  5]: "
-                                     "section 'Foo' already exists")
+                                     "section {!r} already exists".format('Foo'))
             self.assertEqual(e.args, ("Foo", '<foo-bar>', 5))
 
             with self.assertRaises(configparser.DuplicateOptionError) as cm:
                 cf.read_dict({'Bar': {'opt': 'val', 'OPT': 'is really `opt`'}})
             e = cm.exception
-            self.assertEqual(str(e), "While reading from <dict>: option 'opt' "
-                                     "in section 'Bar' already exists")
+            self.assertEqual(str(e), "While reading from <dict>: option {!r} "
+                                     "in section {!r} already exists".format(
+                                         'opt', 'Bar'))
             self.assertEqual(e.args, ("Bar", "opt", "<dict>", None))
 
     def test_write(self):
@@ -831,6 +841,7 @@ boolean {0[0]} NO
         self.assertEqual(set(cf['section2'].keys()), set(['name22']))
         self.assertEqual(set(cf['section3'].keys()), set())
         self.assertEqual(cf.sections(), ['section1', 'section2', 'section3'])
+
 
 
 class StrictTestCase(BasicTestCase):
@@ -1461,8 +1472,8 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         self.assertEqual(error.source, None)
         self.assertEqual(error.lineno, None)
         self.assertEqual(error.args, ('section', 'option', None, None))
-        self.assertEqual(str(error), "Option 'option' in section 'section' "
-                                     "already exists")
+        self.assertEqual(str(error), "Option {!r} in section {!r} already "
+                                     "exists".format('option', 'section'))
 
     def test_interpolation_depth_error(self):
         error = configparser.InterpolationDepthError('option', 'section',
@@ -1501,11 +1512,11 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
             parser['section']['invalid_percent']
         self.assertEqual(str(cm.exception), "'%' must be followed by '%' or "
-                                            "'(', found: '%'")
+                                            "'(', found: {!r}".format('%'))
         with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
             parser['section']['invalid_reference']
         self.assertEqual(str(cm.exception), "bad interpolation variable "
-                                            "reference '%(()'")
+                                            "reference {!r}".format('%(()'))
 
     def test_readfp_deprecation(self):
         sio = io.StringIO("""
@@ -1524,7 +1535,7 @@ class CoverageOneHundredTestCase(unittest.TestCase):
     def test_safeconfigparser_deprecation(self):
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always", DeprecationWarning)
-            parser = configparser.SafeConfigParser()
+            configparser.SafeConfigParser()
         for warning in w:
             self.assertTrue(warning.category is DeprecationWarning)
 
@@ -1716,6 +1727,127 @@ class InlineCommentStrippingTestCase(unittest.TestCase):
         self.assertEqual(s['k3'], 'v3;#//still v3# and still v3')
 
 
+class UnicodeBackportTestCase(unittest.TestCase):
+    """Test for the backport to check if the Unicode coercion works."""
+
+    def test_unicode_none_old_style(self):
+        cp = configparser.ConfigParser(allow_no_value=True)
+        cp.add_section("section")
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp.set("section", "nothing", None)
+        self.assertIsAlright(cp, None)
+
+    def test_unicode_none_new_style(self):
+        cp = configparser.ConfigParser(allow_no_value=True)
+        cp["section"] = {}
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp["section"]["nothing"] = None
+        self.assertIsAlright(cp, None)
+
+    def test_unicode_none_new_style_one_step(self):
+        cp = configparser.ConfigParser(allow_no_value=True)
+        cp["section"] = {'nothing': None}
+        self.assertIsAlright(cp, None)
+
+    def test_unicode_unicode_old_style(self):
+        cp = configparser.ConfigParser()
+        cp.add_section("section")
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp.set("section", "nothing", "nada")
+        self.assertIsAlright(cp, "nada")
+
+    def test_unicode_unicode_new_style(self):
+        cp = configparser.ConfigParser()
+        cp["section"] = {}
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp["section"]["nothing"] = "nada"
+        self.assertIsAlright(cp, "nada")
+
+    def test_unicode_unicode_new_style_one_step(self):
+        cp = configparser.ConfigParser()
+        cp['section'] = {'nothing': 'nada'}
+        self.assertIsAlright(cp, 'nada')
+
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    def test_bytes_bytes_old_style(self):
+        cp = configparser.ConfigParser()
+        cp.add_section(b"section")
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp.set(b"section", b"nothing", b"nada")
+        self.assertIsAlright(cp, b"nada")
+
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    def test_bytes_bytes_new_style(self):
+        cp = configparser.ConfigParser()
+        cp[b"section"] = {}
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        cp[b"section"][b"nothing"] = b"nada"
+        self.assertIsAlright(cp, b"nada")
+
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    def test_bytes_bytes_new_style_one_step(self):
+        cp = configparser.ConfigParser()
+        cp[b'section'] = {b'nothing': b'nada'}
+        self.assertIsAlright(cp, b'nada')
+
+    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
+    def test_bytes_exceptions(self):
+        cp = configparser.ConfigParser()
+        cp[b'section'] = {b'nothing': b'nada'}
+        self.assertIsAlright(cp, b'nada')
+        with self.assertRaises(UnicodeDecodeError):
+            cp.add_section(b'\xef')
+        with self.assertRaises(UnicodeDecodeError):
+            cp[b'\xef'] = {}
+        with self.assertRaises(UnicodeDecodeError):
+            cp.set('section', b'\xef', b'value')
+        with self.assertRaises(UnicodeDecodeError):
+            cp['section'][b'\xef'] = b'value'
+        with self.assertRaises(UnicodeDecodeError):
+            cp['new'] = {b'\xef': b'value'}
+        with self.assertRaises(UnicodeDecodeError):
+            cp.set('section', b'\xef', b'\xef')
+        with self.assertRaises(UnicodeDecodeError):
+            cp['section'][b'\xef'] = b'\xef'
+        with self.assertRaises(UnicodeDecodeError):
+            cp['new'] = {b'key': b'\xef'}
+
+    def test_unicode_extended_characters(self):
+        cp = configparser.ConfigParser()
+        cp.add_section('łąka1')
+        cp['łąka2'] = {}
+        cp.set('section', 'łąka1', 'value')
+        cp['section']['łąka2'] = 'value'
+        self.assertEqual(set(cp['section']), set(['łąka1', 'łąka2']))
+        cp['new'] = {'łąka': 'value'}
+        cp.set('section', 'key', 'łąka')
+        cp['section']['key'] = 'łąka'
+        self.assertEqual(cp['section']['key'], 'łąka')
+        cp['new'] = {'key': 'łąka'}
+
+    def assertIsAlright(self, cp, optvalue):
+        self.assertIn('section', cp)
+        self.assertIn('nothing', cp['section'])
+        self.assertIsInstance(cp.sections()[0], str)
+        self.assertIsInstance(cp.options('section')[0], str)
+        self.assertEqual(cp.get('section', 'nothing'), optvalue)
+        self.assertIsInstance([sect for sect in cp][0], str)
+        self.assertIsInstance([opt for opt in cp['section']][0], str)
+        self.assertEqual(cp['section']['nothing'], optvalue)
+        if PY2:
+            self.assertIn('nothing', cp[b'section'])
+            self.assertIsInstance(cp.options(b'section')[0], str)
+            self.assertEqual(cp.get(b'section', b'nothing'), optvalue)
+            self.assertIsInstance([opt for opt in cp[b'section']][0], str)
+            self.assertEqual(cp[b'section'][b'nothing'], optvalue)
+
+
 def load_tests(loader, tests, pattern):
     suite = unittest.TestSuite()
     test_cases = (
@@ -1740,6 +1872,7 @@ def load_tests(loader, tests, pattern):
         CoverageOneHundredTestCase,
         ExceptionPicklingTestCase,
         InlineCommentStrippingTestCase,
+        UnicodeBackportTestCase,
         )
     for case in test_cases:
         suite.addTests(loader.loadTestsFromTestCase(case))

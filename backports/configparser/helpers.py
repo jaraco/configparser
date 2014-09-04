@@ -1,6 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from collections import MutableMapping
 try:
     from thread import get_ident
@@ -12,6 +17,8 @@ except ImportError:
 
 
 from future.backports.misc import OrderedDict
+from future.builtins import str
+from future.utils import PY2
 
 
 # from reprlib 3.2.1
