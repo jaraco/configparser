@@ -364,7 +364,7 @@ class MissingSectionHeaderError(ParsingError):
 _UNSET = object()
 
 
-class Interpolation:
+class Interpolation(object):
     """Dummy interpolation that passes the value through with no changes."""
 
     def before_get(self, parser, section, option, value, defaults):
@@ -604,11 +604,16 @@ class RawConfigParser(MutableMapping):
                       '0': False, 'no': False, 'false': False, 'off': False}
 
     def __init__(self, defaults=None, dict_type=_default_dict,
-                 allow_no_value=False, *, delimiters=('=', ':'),
-                 comment_prefixes=('#', ';'), inline_comment_prefixes=None,
-                 strict=True, empty_lines_in_values=True,
-                 default_section=DEFAULTSECT,
-                 interpolation=_UNSET):
+                 allow_no_value=False, **kwargs):
+
+        # keyword-only arguments
+        delimiters = kwargs.get('delimiters', ('=', ':'))
+        comment_prefixes = kwargs.get('comment_prefixes', ('#', ';'))
+        inline_comment_prefixes = kwargs.get('inline_comment_prefixes', None)
+        strict = kwargs.get('strict', True)
+        empty_lines_in_values = kwargs.get('empty_lines_in_values', True)
+        default_section = kwargs.get('default_section', DEFAULTSECT)
+        interpolation = kwargs.get('interpolation', _UNSET)
 
         self._dict = dict_type
         self._sections = self._dict()
@@ -775,7 +780,7 @@ class RawConfigParser(MutableMapping):
         )
         self.read_file(fp, source=filename)
 
-    def get(self, section, option, *, raw=False, vars=None, fallback=_UNSET):
+    def get(self, section, option, **kwargs):
         """Get an option value for a given section.
 
         If `vars' is provided, it must be a dictionary. The option is looked up
@@ -790,6 +795,11 @@ class RawConfigParser(MutableMapping):
 
         The section DEFAULT is special.
         """
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+        fallback = kwargs.get('fallback', _UNSET)
+
         try:
             d = self._unify_values(section, vars)
         except NoSectionError:
@@ -815,8 +825,12 @@ class RawConfigParser(MutableMapping):
     def _get(self, section, conv, option, **kwargs):
         return conv(self.get(section, option, **kwargs))
 
-    def getint(self, section, option, *, raw=False, vars=None,
-               fallback=_UNSET):
+    def getint(self, section, option, **kwargs):
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+        fallback = kwargs.get('fallback', _UNSET)
+
         try:
             return self._get(section, int, option, raw=raw, vars=vars)
         except (NoSectionError, NoOptionError):
@@ -825,8 +839,12 @@ class RawConfigParser(MutableMapping):
             else:
                 return fallback
 
-    def getfloat(self, section, option, *, raw=False, vars=None,
-                 fallback=_UNSET):
+    def getfloat(self, section, option, **kwargs):
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+        fallback = kwargs.get('fallback', _UNSET)
+
         try:
             return self._get(section, float, option, raw=raw, vars=vars)
         except (NoSectionError, NoOptionError):
@@ -835,8 +853,12 @@ class RawConfigParser(MutableMapping):
             else:
                 return fallback
 
-    def getboolean(self, section, option, *, raw=False, vars=None,
-                   fallback=_UNSET):
+    def getboolean(self, section, option, **kwargs):
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+        fallback = kwargs.get('fallback', _UNSET)
+
         try:
             return self._get(section, self._convert_to_boolean, option,
                              raw=raw, vars=vars)
@@ -1173,7 +1195,7 @@ class RawConfigParser(MutableMapping):
             raise ValueError('Not a boolean: %s' % value)
         return self.BOOLEAN_STATES[value.lower()]
 
-    def _validate_value_types(self, *, section="", option="", value=""):
+    def _validate_value_types(self, **kwargs):
         """Raises a TypeError for non-string values.
 
         The only legal non-string value if we allow valueless
@@ -1186,6 +1208,11 @@ class RawConfigParser(MutableMapping):
         for RawConfigParsers. It is invoked in every case for mapping protocol
         access and in ConfigParser.set().
         """
+        # keyword-only arguments
+        section = kwargs.get('section', "")
+        option = kwargs.get('option', "")
+        value = kwargs.get('value', "")
+
         if PY2 and bytes in (type(section), type(option), type(value)):
             # we allow for a little unholy magic for Python 2 so that
             # people not using unicode_literals can still use the library
@@ -1287,19 +1314,35 @@ class SectionProxy(MutableMapping):
         else:
             return self._parser.defaults()
 
-    def get(self, option, fallback=None, *, raw=False, vars=None):
+    def get(self, option, fallback=None, **kwargs):
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+
         return self._parser.get(self._name, option, raw=raw, vars=vars,
                                 fallback=fallback)
 
-    def getint(self, option, fallback=None, *, raw=False, vars=None):
+    def getint(self, option, fallback=None, **kwargs):
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+
         return self._parser.getint(self._name, option, raw=raw, vars=vars,
                                    fallback=fallback)
 
-    def getfloat(self, option, fallback=None, *, raw=False, vars=None):
+    def getfloat(self, option, fallback=None, **kwargs):
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+
         return self._parser.getfloat(self._name, option, raw=raw, vars=vars,
                                      fallback=fallback)
 
-    def getboolean(self, option, fallback=None, *, raw=False, vars=None):
+    def getboolean(self, option, fallback=None, **kwargs):
+        # keyword-only arguments
+        raw = kwargs.get('raw', False)
+        vars = kwargs.get('vars', None)
+
         return self._parser.getboolean(self._name, option, raw=raw, vars=vars,
                                        fallback=fallback)
 

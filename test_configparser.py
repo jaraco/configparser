@@ -1410,7 +1410,7 @@ class CopyTestCase(BasicTestCase):
         return cf_copy
 
 
-class FakeFile:
+class FakeFile(object):
     def __init__(self):
         file_path = support.findfile("cfgparser.1")
         with open(file_path) as f:
