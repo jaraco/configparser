@@ -4,13 +4,15 @@ configparser
 
 The ancient ``ConfigParser`` module available in the standard library 2.x has
 seen a major update in Python 3.2. This is a backport of those changes so that
-they can be used directly in Python 2.6 - 2.7.
+they can be used directly in Python 2.6 - 3.5.
 
-To use ``configparser`` instead of ``ConfigParser``, simply replace::
-  
-  import ConfigParser
+To use the ``configparser`` backport instead of the built-in version on both
+Python 2 and Python 3, simply import it explicitly as a backport::
 
-with::
+  from backports import configparser
+
+If you'd like to use the backport on Python 2 and the built-in version on
+Python 3, use that invocation instead::
 
   import configparser
 
@@ -51,7 +53,7 @@ sports a bunch of interesting new features:
     >>> section['title'] = 'Options (editable: %(editable)s)'
     >>> section['title']
     'Options (editable: no)'
-  
+
 * there's now one default ``ConfigParser`` class, which basically is the old
   ``SafeConfigParser`` with a bunch of tweaks which make it more predictable for
   users. Don't need interpolation? Simply use
@@ -70,14 +72,14 @@ sports a bunch of interesting new features:
   * the classic ``%(string-like)s`` syntax (called ``BasicInterpolation``)
 
   * a new ``${buildout:like}`` syntax (called ``ExtendedInterpolation``)
-  
+
 * fallback values may be specified in getters (`more info
   <http://docs.python.org/3/library/configparser.html#fallback-values>`__)::
 
     >>> config.get('closet', 'monster',
     ...            fallback='No such things as monsters')
     'No such things as monsters'
-  
+
 * ``ConfigParser`` objects can now read data directly `from strings
   <http://docs.python.org/3/library/configparser.html#configparser.ConfigParser.read_string>`__
   and `from dictionaries
@@ -85,7 +87,7 @@ sports a bunch of interesting new features:
   That means importing configuration from JSON or specifying default values for
   the whole configuration (multiple sections) is now a single line of code. Same
   goes for copying data from another ``ConfigParser`` instance, thanks to its
-  mapping protocol support. 
+  mapping protocol support.
 
 * many smaller tweaks, updates and fixes
 
@@ -104,7 +106,7 @@ gives you the certainty that what's stored in a configuration object is text.
 Once your configuration is read, the rest of your application doesn't have to
 deal with encoding issues. All you have is text [2]_. The only two phases when
 you should explicitly state encoding is when you either read from an external
-source (e.g. a file) or write back. 
+source (e.g. a file) or write back.
 
 Versioning
 ----------
@@ -113,17 +115,19 @@ This backport is intended to keep 100% compatibility with the vanilla release in
 Python 3.2+. To help maintaining a version you want and expect, a versioning
 scheme is used where:
 
-* the first three numbers indicate the version of Python 3.x from which the
+* the first two numbers indicate the version of Python 3 from which the
   backport is done
 
-* a backport release number is provided after the ``r`` letter
+* a backport release number is provided as the final number (zero-indexed)
 
-For example, ``3.3.0r1`` is the **first** release of ``configparser`` compatible
-with the library found in Python **3.3.0**.
+For example, ``3.5.2`` is the **third** backport release of the
+``configparser`` library as seen in Python 3.5.  Note that ``3.5.2`` does
+**NOT** necessarily mean this backport version is based on the standard library
+of Python 3.5.2.
 
-A single exception from the 100% compatibility principle is that bugs fixed
-before releasing another minor Python 3.x.y version **will be included** in the
-backport releases done in the mean time. This rule applies to bugs only.
+One exception from the 100% compatibility principle is that bugs fixed before
+releasing another minor Python 3 bugfix version **will be included** in the
+backport releases done in the mean time.
 
 Maintenance
 -----------
@@ -133,11 +137,35 @@ This backport is maintained on BitBucket by Łukasz Langa, the current vanilla
 
 * `configparser Mercurial repository <https://bitbucket.org/ambv/configparser>`_
 
-* `configparser issue tracker <https://bitbucket.org/ambv/configparser/issues>`_ 
+* `configparser issue tracker <https://bitbucket.org/ambv/configparser/issues>`_
 
 Change Log
 ----------
 
+3.5.0
+~~~~~
+
+* a complete rewrite of the backport; now single codebase working on Python
+  2.6 - 3.5. To use on Python 3 import ``from backports import configparser``
+  instead of the built-in version.
+
+* compatible with 3.4.1 + fixes for `#19546
+  <http://bugs.python.org/issue19546>`_
+
+* fixes `BitBucket issue #1
+  <https://bitbucket.org/ambv/configparser/issue/1>`_: versioning non-compliant
+  with PEP 386
+
+* fixes `BitBucket issue #3
+  <https://bitbucket.org/ambv/configparser/issue/3>`_: ``reload(sys);
+  sys.setdefaultencoding('utf8')`` in setup.py
+
+* fixes `BitBucket issue #5
+  <https://bitbucket.org/ambv/configparser/issue/5>`_: Installing the backport
+  on Python 3 breaks virtualenv
+
+* fixes `BitBucket issue #6
+  <https://bitbucket.org/ambv/configparser/issue/6>`_: PyPy compatibility
 3.3.0r2
 ~~~~~~~
 
