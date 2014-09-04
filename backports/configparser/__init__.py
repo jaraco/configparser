@@ -133,7 +133,7 @@ import re
 import sys
 import warnings
 
-from configparser_helpers import _ChainMap
+from backports.configparser.helpers import _ChainMap
 
 __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
            "NoOptionError", "InterpolationError", "InterpolationDepthError",

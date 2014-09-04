@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from configparser_helpers import _ChainMap
+from backports.configparser.helpers import _ChainMap
 import copy
 import pickle
 import unittest
