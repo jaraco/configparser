@@ -4,7 +4,11 @@
 from backports.configparser.helpers import _ChainMap
 import copy
 import pickle
-import unittest
+
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 class TestChainMap(unittest.TestCase):
 

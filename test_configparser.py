@@ -6,12 +6,15 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import collections
 import io
 import os
 import textwrap
-import unittest
 import warnings
+
+try:
+    import unittest2 as unittest
+except ImportError:
+    import unittest
 
 try:
     from test import support
@@ -19,10 +22,10 @@ except ImportError:
     from test import test_support as support
 
 from backports import configparser
-from backports.configparser.helpers import PY2
+from backports.configparser.helpers import UserDict, PY2
 
 
-class SortedDict(collections.UserDict):
+class SortedDict(UserDict):
 
     def items(self):
         return sorted(self.data.items())
@@ -1274,8 +1277,8 @@ class ConfigParserTestCaseNoValue(ConfigParserTestCase):
 
 class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass):
     config_class = configparser.ConfigParser
-    delimiters = {'='}
-    comment_prefixes = {'#'}
+    delimiters = ['=']
+    comment_prefixes = ['#']
     allow_no_value = True
 
     def test_cfgparser_dot_3(self):

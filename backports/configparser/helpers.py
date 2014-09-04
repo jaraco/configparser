@@ -8,6 +8,10 @@ from __future__ import unicode_literals
 
 from collections import MutableMapping
 try:
+    from collections import UserDict
+except ImportError:
+    from UserDict import UserDict
+try:
     from thread import get_ident
 except ImportError:
     try:
