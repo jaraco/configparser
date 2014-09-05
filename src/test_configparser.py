@@ -32,7 +32,7 @@ class SortedDict(collections.UserDict):
     __iter__ = iterkeys
 
 
-class CfgParserTestCaseClass(unittest.TestCase):
+class CfgParserTestCaseClass:
     allow_no_value = False
     delimiters = ('=', ':')
     comment_prefixes = (';', '#')
@@ -579,7 +579,7 @@ boolean {0[0]} NO
             return e
         else:
             self.fail("expected exception type %s.%s"
-                      % (exc.__module__, exc.__name__))
+                      % (exc.__module__, exc.__qualname__))
 
     def test_boolean(self):
         cf = self.fromstring(
@@ -626,15 +626,15 @@ boolean {0[0]} NO
                     oops{equals}this won't
                 """.format(equals=self.delimiters[0])), source='<foo-bar>')
             e = cm.exception
-            self.assertEqual(str(e), "While reading from <foo-bar> [line  5]: "
-                                     "section 'Foo' already exists")
+            self.assertEqual(str(e), "While reading from '<foo-bar>' "
+                                     "[line  5]: section 'Foo' already exists")
             self.assertEqual(e.args, ("Foo", '<foo-bar>', 5))
 
             with self.assertRaises(configparser.DuplicateOptionError) as cm:
                 cf.read_dict({'Bar': {'opt': 'val', 'OPT': 'is really `opt`'}})
             e = cm.exception
-            self.assertEqual(str(e), "While reading from <dict>: option 'opt' "
-                                     "in section 'Bar' already exists")
+            self.assertEqual(str(e), "While reading from '<dict>': option "
+                                     "'opt' in section 'Bar' already exists")
             self.assertEqual(e.args, ("Bar", "opt", "<dict>", None))
 
     def test_write(self):
@@ -707,8 +707,7 @@ boolean {0[0]} NO
 
     def test_read_returns_file_list(self):
         if self.delimiters[0] != '=':
-            # skip reading the file if we're using an incompatible format
-            return
+            self.skipTest('incompatible format')
         file1 = support.findfile("cfgparser.1")
         # check when we pass a mix of readable and non-readable files:
         cf = self.newconfig()
@@ -830,12 +829,12 @@ boolean {0[0]} NO
         self.assertEqual(cf.sections(), ['section1', 'section2', 'section3'])
 
 
-class StrictTestCase(BasicTestCase):
+class StrictTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.RawConfigParser
     strict = True
 
 
-class ConfigParserTestCase(BasicTestCase):
+class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
 
     def test_interpolation(self):
@@ -924,7 +923,7 @@ class ConfigParserTestCase(BasicTestCase):
         self.assertRaises(ValueError, cf.add_section, self.default_section)
 
 
-class ConfigParserTestCaseNoInterpolation(BasicTestCase):
+class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
     interpolation = None
     ini = textwrap.dedent("""
@@ -989,7 +988,7 @@ class ConfigParserTestCaseNonStandardDelimiters(ConfigParserTestCase):
 class ConfigParserTestCaseNonStandardDefaultSection(ConfigParserTestCase):
     default_section = 'general'
 
-class MultilineValuesTestCase(BasicTestCase):
+class MultilineValuesTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
     wonderful_spam = ("I'm having spam spam spam spam "
                       "spam spam spam beaked beans spam "
@@ -1017,7 +1016,7 @@ class MultilineValuesTestCase(BasicTestCase):
         self.assertEqual(cf_from_file.get('section8', 'lovely_spam4'),
                          self.wonderful_spam.replace('\t\n', '\n'))
 
-class RawConfigParserTestCase(BasicTestCase):
+class RawConfigParserTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.RawConfigParser
 
     def test_interpolation(self):
@@ -1064,7 +1063,7 @@ class RawConfigParserTestCaseNonStandardDelimiters(RawConfigParserTestCase):
     comment_prefixes = ('//', '"')
     inline_comment_prefixes = ('//', '"')
 
-class RawConfigParserTestSambaConf(CfgParserTestCaseClass):
+class RawConfigParserTestSambaConf(CfgParserTestCaseClass, unittest.TestCase):
     config_class = configparser.RawConfigParser
     comment_prefixes = ('#', ';', '----')
     inline_comment_prefixes = ('//',)
@@ -1084,7 +1083,7 @@ class RawConfigParserTestSambaConf(CfgParserTestCaseClass):
         self.assertEqual(cf.get("global", "hosts allow"), "127.")
         self.assertEqual(cf.get("tmp", "echo command"), "cat %s; rm %s")
 
-class ConfigParserTestCaseExtendedInterpolation(BasicTestCase):
+class ConfigParserTestCaseExtendedInterpolation(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
     interpolation = configparser.ExtendedInterpolation()
     default_section = 'common'
@@ -1258,7 +1257,7 @@ class ConfigParserTestCaseExtendedInterpolation(BasicTestCase):
 class ConfigParserTestCaseNoValue(ConfigParserTestCase):
     allow_no_value = True
 
-class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass):
+class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass, unittest.TestCase):
     config_class = configparser.ConfigParser
     delimiters = {'='}
     comment_prefixes = {'#'}
@@ -1355,7 +1354,7 @@ class SortedTestCase(RawConfigParserTestCase):
                          "o4 = 1\n\n")
 
 
-class CompatibleTestCase(CfgParserTestCaseClass):
+class CompatibleTestCase(CfgParserTestCaseClass, unittest.TestCase):
     config_class = configparser.RawConfigParser
     comment_prefixes = '#;'
     inline_comment_prefixes = ';'
@@ -1377,7 +1376,7 @@ class CompatibleTestCase(CfgParserTestCaseClass):
         self.assertEqual(cf.get('Commented Bar', 'quirk'),
                          'this;is not a comment')
 
-class CopyTestCase(BasicTestCase):
+class CopyTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
 
     def fromstring(self, string, defaults=None):
@@ -1419,13 +1418,18 @@ def readline_generator(f):
 
 class ReadFileTestCase(unittest.TestCase):
     def test_file(self):
-        file_path = support.findfile("cfgparser.1")
-        parser = configparser.ConfigParser()
-        with open(file_path) as f:
-            parser.read_file(f)
-        self.assertIn("Foo Bar", parser)
-        self.assertIn("foo", parser["Foo Bar"])
-        self.assertEqual(parser["Foo Bar"]["foo"], "newbar")
+        file_paths = [support.findfile("cfgparser.1")]
+        try:
+            file_paths.append(file_paths[0].encode('utf8'))
+        except UnicodeEncodeError:
+            pass   # unfortunately we can't test bytes on this path
+        for file_path in file_paths:
+            parser = configparser.ConfigParser()
+            with open(file_path) as f:
+                parser.read_file(f)
+            self.assertIn("Foo Bar", parser)
+            self.assertIn("foo", parser["Foo Bar"])
+            self.assertEqual(parser["Foo Bar"]["foo"], "newbar")
 
     def test_iterable(self):
         lines = textwrap.dedent("""
@@ -1446,6 +1450,53 @@ class ReadFileTestCase(unittest.TestCase):
         self.assertIn("Foo Bar", parser)
         self.assertIn("foo", parser["Foo Bar"])
         self.assertEqual(parser["Foo Bar"]["foo"], "newbar")
+
+    def test_source_as_bytes(self):
+        """Issue #18260."""
+        lines = textwrap.dedent("""
+        [badbad]
+        [badbad]""").strip().split('\n')
+        parser = configparser.ConfigParser()
+        with self.assertRaises(configparser.DuplicateSectionError) as dse:
+            parser.read_file(lines, source=b"badbad")
+        self.assertEqual(
+            str(dse.exception),
+            "While reading from b'badbad' [line  2]: section 'badbad' "
+            "already exists"
+        )
+        lines = textwrap.dedent("""
+        [badbad]
+        bad = bad
+        bad = bad""").strip().split('\n')
+        parser = configparser.ConfigParser()
+        with self.assertRaises(configparser.DuplicateOptionError) as dse:
+            parser.read_file(lines, source=b"badbad")
+        self.assertEqual(
+            str(dse.exception),
+            "While reading from b'badbad' [line  3]: option 'bad' in section "
+            "'badbad' already exists"
+        )
+        lines = textwrap.dedent("""
+        [badbad]
+        = bad""").strip().split('\n')
+        parser = configparser.ConfigParser()
+        with self.assertRaises(configparser.ParsingError) as dse:
+            parser.read_file(lines, source=b"badbad")
+        self.assertEqual(
+            str(dse.exception),
+            "Source contains parsing errors: b'badbad'\n\t[line  2]: '= bad'"
+        )
+        lines = textwrap.dedent("""
+        [badbad
+        bad = bad""").strip().split('\n')
+        parser = configparser.ConfigParser()
+        with self.assertRaises(configparser.MissingSectionHeaderError) as dse:
+            parser.read_file(lines, source=b"badbad")
+        self.assertEqual(
+            str(dse.exception),
+            "File contains no section headers.\nfile: b'badbad', line: 1\n"
+            "'[badbad'"
+        )
 
 
 class CoverageOneHundredTestCase(unittest.TestCase):
@@ -1712,28 +1763,58 @@ class InlineCommentStrippingTestCase(unittest.TestCase):
         self.assertEqual(s['k2'], 'v2')
         self.assertEqual(s['k3'], 'v3;#//still v3# and still v3')
 
+class ExceptionContextTestCase(unittest.TestCase):
+    """ Test that implementation details doesn't leak
+    through raising exceptions. """
 
-def test_main():
-    support.run_unittest(
-        ConfigParserTestCase,
-        ConfigParserTestCaseNonStandardDelimiters,
-        ConfigParserTestCaseNoValue,
-        ConfigParserTestCaseExtendedInterpolation,
-        ConfigParserTestCaseLegacyInterpolation,
-        ConfigParserTestCaseNoInterpolation,
-        ConfigParserTestCaseTrickyFile,
-        MultilineValuesTestCase,
-        RawConfigParserTestCase,
-        RawConfigParserTestCaseNonStandardDelimiters,
-        RawConfigParserTestSambaConf,
-        SortedTestCase,
-        Issue7005TestCase,
-        StrictTestCase,
-        CompatibleTestCase,
-        CopyTestCase,
-        ConfigParserTestCaseNonStandardDefaultSection,
-        ReadFileTestCase,
-        CoverageOneHundredTestCase,
-        ExceptionPicklingTestCase,
-        InlineCommentStrippingTestCase,
-        )
+    def test_get_basic_interpolation(self):
+        parser = configparser.ConfigParser()
+        parser.read_string("""
+        [Paths]
+        home_dir: /Users
+        my_dir: %(home_dir1)s/lumberjack
+        my_pictures: %(my_dir)s/Pictures
+        """)
+        cm = self.assertRaises(configparser.InterpolationMissingOptionError)
+        with cm:
+            parser.get('Paths', 'my_dir')
+        self.assertIs(cm.exception.__suppress_context__, True)
+
+    def test_get_extended_interpolation(self):
+        parser = configparser.ConfigParser(
+          interpolation=configparser.ExtendedInterpolation())
+        parser.read_string("""
+        [Paths]
+        home_dir: /Users
+        my_dir: ${home_dir1}/lumberjack
+        my_pictures: ${my_dir}/Pictures
+        """)
+        cm = self.assertRaises(configparser.InterpolationMissingOptionError)
+        with cm:
+            parser.get('Paths', 'my_dir')
+        self.assertIs(cm.exception.__suppress_context__, True)
+
+    def test_missing_options(self):
+        parser = configparser.ConfigParser()
+        parser.read_string("""
+        [Paths]
+        home_dir: /Users
+        """)
+        with self.assertRaises(configparser.NoSectionError) as cm:
+            parser.options('test')
+        self.assertIs(cm.exception.__suppress_context__, True)
+
+    def test_missing_section(self):
+        config = configparser.ConfigParser()
+        with self.assertRaises(configparser.NoSectionError) as cm:
+            config.set('Section1', 'an_int', '15')
+        self.assertIs(cm.exception.__suppress_context__, True)
+
+    def test_remove_option(self):
+        config = configparser.ConfigParser()
+        with self.assertRaises(configparser.NoSectionError) as cm:
+            config.remove_option('Section1', 'an_int')
+        self.assertIs(cm.exception.__suppress_context__, True)
+
+if __name__ == '__main__':
+    unittest.main()

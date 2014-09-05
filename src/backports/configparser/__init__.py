@@ -144,23 +144,6 @@ MAX_INTERPOLATION_DEPTH = 10
 class Error(Exception):
     """Base class for ConfigParser exceptions."""
 
-    def _get_message(self):
-        """Getter for 'message'; needed only to override deprecation in
-        BaseException.
-        """
-        return self.__message
-
-    def _set_message(self, value):
-        """Setter for 'message'; needed only to override deprecation in
-        BaseException.
-        """
-        self.__message = value
-
-    # BaseException.message has been deprecated since Python 2.6.  To prevent
-    # DeprecationWarning from popping up over this pre-existing attribute, use
-    # a new property that takes lookup precedence.
-    message = property(_get_message, _set_message)
-
     def __init__(self, msg=''):
         self.message = msg
         Exception.__init__(self, msg)
@@ -191,7 +174,7 @@ class DuplicateSectionError(Error):
     def __init__(self, section, source=None, lineno=None):
         msg = [repr(section), " already exists"]
         if source is not None:
-            message = ["While reading from ", source]
+            message = ["While reading from ", repr(source)]
             if lineno is not None:
                 message.append(" [line {0:2d}]".format(lineno))
             message.append(": section ")
@@ -217,7 +200,7 @@ class DuplicateOptionError(Error):
         msg = [repr(option), " in section ", repr(section),
                " already exists"]
         if source is not None:
-            message = ["While reading from ", source]
+            message = ["While reading from ", repr(source)]
             if lineno is not None:
                 message.append(" [line {0:2d}]".format(lineno))
             message.append(": option ")
@@ -303,7 +286,7 @@ class ParsingError(Error):
             raise ValueError("Required argument `source' not given.")
         elif filename:
             source = filename
-        Error.__init__(self, 'Source contains parsing errors: %s' % source)
+        Error.__init__(self, 'Source contains parsing errors: %r' % source)
         self.source = source
         self.errors = []
         self.args = (source, )
@@ -339,7 +322,7 @@ class MissingSectionHeaderError(ParsingError):
     def __init__(self, filename, lineno, line):
         Error.__init__(
             self,
-            'File contains no section headers.\nfile: %s, line: %d\n%r' %
+            'File contains no section headers.\nfile: %r, line: %d\n%r' %
             (filename, lineno, line))
         self.source = filename
         self.lineno = lineno
@@ -427,7 +410,7 @@ class BasicInterpolation(Interpolation):
                     v = map[var]
                 except KeyError:
                     raise InterpolationMissingOptionError(
-                        option, section, rest, var)
+                        option, section, rest, var) from None
                 if "%" in v:
                     self._interpolate_some(parser, option, accum, v,
                                            section, map, depth + 1)
@@ -456,7 +439,7 @@ class ExtendedInterpolation(Interpolation):
         tmp_value = self._KEYCRE.sub('', tmp_value) # valid syntax
         if '$' in tmp_value:
             raise ValueError("invalid interpolation syntax in %r at "
-                             "position %d" % (value, tmp_value.find('%')))
+                             "position %d" % (value, tmp_value.find('$')))
         return value
 
     def _interpolate_some(self, parser, option, accum, rest, section, map,
@@ -499,7 +482,7 @@ class ExtendedInterpolation(Interpolation):
                             "More than one ':' found: %r" % (rest,))
                 except (KeyError, NoSectionError, NoOptionError):
                     raise InterpolationMissingOptionError(
-                        option, section, rest, ":".join(path))
+                        option, section, rest, ":".join(path)) from None
                 if "$" in v:
                     self._interpolate_some(parser, opt, accum, v, sect,
                                            dict(parser.items(sect, raw=True)),
@@ -532,7 +515,7 @@ class LegacyInterpolation(Interpolation):
                     value = value % vars
                 except KeyError as e:
                     raise InterpolationMissingOptionError(
-                        option, section, rawval, e.args[0])
+                        option, section, rawval, e.args[0]) from None
             else:
                 break
         if value and "%(" in value:
@@ -664,7 +647,7 @@ class RawConfigParser(MutableMapping):
         try:
             opts = self._sections[section].copy()
         except KeyError:
-            raise NoSectionError(section)
+            raise NoSectionError(section) from None
         opts.update(self._defaults)
         return list(opts.keys())
 
@@ -893,7 +876,7 @@ class RawConfigParser(MutableMapping):
             try:
                 sectdict = self._sections[section]
             except KeyError:
-                raise NoSectionError(section)
+                raise NoSectionError(section) from None
         sectdict[self.optionxform(option)] = value
 
     def write(self, fp, space_around_delimiters=True):
@@ -934,7 +917,7 @@ class RawConfigParser(MutableMapping):
             try:
                 sectdict = self._sections[section]
             except KeyError:
-                raise NoSectionError(section)
+                raise NoSectionError(section) from None
         option = self.optionxform(option)
         existed = option in sectdict
         if existed:
