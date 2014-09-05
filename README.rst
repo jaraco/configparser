@@ -228,53 +228,35 @@ This section is technical and should bother you only if you are wondering how
 this backport is produced. If the implementation details of this backport are
 not important for you, feel free to ignore the following content.
 
-``configparser`` is converted using `3to2 <http://pypi.python.org/pypi/3to2>`_.
-Because a fully automatic conversion was not doable, I took the following
-branching approach:
+``configparser`` is converted using `python-future
+<http://python-future.org>`_ and free time.  Because a fully automatic
+conversion was not doable, I took the following branching approach:
 
 * the ``3.x`` branch holds unchanged files synchronized from the upstream
   CPython repository. The synchronization is currently done by manually copying
   the required files and stating from which CPython changeset they come from.
 
-* the ``3.x-clean`` branch holds a version of the ``3.x`` code with some tweaks
+* the ``default`` branch holds a version of the ``3.x`` code with some tweaks
   that make it independent from libraries and constructions unavailable on 2.x.
-  Code on this branch still *must* work on the corresponding Python 3.x. You
-  can check this running the supplied unit tests.
-
-* the ``default`` branch holds necessary changes which break unit tests on
-  Python 3.2.  Additional files which are used by the backport are also stored
-  here.
+  Code on this branch still *must* work on the corresponding Python 3.x but
+  will also work on Python 2.6 and 2.7 (including PyPy).  You can check this
+  running the supplied unit tests with ``tox``.
 
 The process works like this:
 
 1. I update the ``3.x`` branch with new versions of files. Commit.
 
-2. I merge the new commit to ``3.x-clean``. Check unit tests. Commit.
+2. I merge the new commit to ``default``. I run ``tox``. Commit.
 
-3. If there are necessary changes that can be made in a 3.x compatible manner,
-   I do them now (still on ``3.x-clean``), check unit tests and commit. If I'm
-   not yet aware of any, no problem.
+3. If there are necessary changes, I do them now (on ``default``). Note that
+   the changes should be written in the syntax subset supported by Python
+   2.6.
 
-4. I merge the changes from ``3.x-clean`` to ``default``. Commit.
+4. I run ``tox``. If it works, I update the docs and release the new version.
+   Otherwise, I go back to point 3. I might use ``pasteurize`` to suggest me
+   required changes but usually I do them manually to keep resulting code in
+   a nicer form.
 
-5. If there are necessary changes that *cannot* be made in a 3.x compatible
-   manner, I do them now (on ``default``). Note that the changes should still
-   be written using 3.x syntax. If I'm not yet aware of any required changes,
-   no problem.
-
-6. I run ``./convert.py`` which is a custom ``3to2`` runner for this project.
-
-7. I run the unit tests with ``unittest2`` on Python 2.x. If the tests are OK,
-   I can prepare a new release.  Otherwise, I revert the ``default`` branch to
-   its previous state (``hg revert .``) and go back to Step 3.
-
-**NOTE:** the ``default`` branch holds unconverted code. This is because keeping
-the conversion step as the last (after any custom changes) helps managing the
-history better. Plus, the merges are nicer and updates of the converter software
-don't create nasty conflicts in the repository.
-
-This process works well but if you have any tips on how to make it simpler and
-faster, do enlighten me :)
 
 Footnotes
 ---------
