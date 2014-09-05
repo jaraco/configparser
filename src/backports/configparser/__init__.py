@@ -136,7 +136,7 @@ import warnings
 
 from backports.configparser.helpers import OrderedDict as _default_dict
 from backports.configparser.helpers import ChainMap as _ChainMap
-from backports.configparser.helpers import str, PY2
+from backports.configparser.helpers import from_none, open, str, PY2
 
 __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
            "NoOptionError", "InterpolationError", "InterpolationDepthError",
@@ -148,7 +148,6 @@ __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
 DEFAULTSECT = "DEFAULT"
 
 MAX_INTERPOLATION_DEPTH = 10
-
 
 
 # exception classes
@@ -420,8 +419,8 @@ class BasicInterpolation(Interpolation):
                 try:
                     v = map[var]
                 except KeyError:
-                    raise InterpolationMissingOptionError(
-                        option, section, rest, var) from None
+                    raise from_none(InterpolationMissingOptionError(
+                        option, section, rest, var))
                 if "%" in v:
                     self._interpolate_some(parser, option, accum, v,
                                            section, map, depth + 1)
@@ -492,8 +491,8 @@ class ExtendedInterpolation(Interpolation):
                             option, section,
                             "More than one ':' found: %r" % (rest,))
                 except (KeyError, NoSectionError, NoOptionError):
-                    raise InterpolationMissingOptionError(
-                        option, section, rest, ":".join(path)) from None
+                    raise from_none(InterpolationMissingOptionError(
+                        option, section, rest, ":".join(path)))
                 if "$" in v:
                     self._interpolate_some(parser, opt, accum, v, sect,
                                            dict(parser.items(sect, raw=True)),
@@ -525,8 +524,8 @@ class LegacyInterpolation(Interpolation):
                 try:
                     value = value % vars
                 except KeyError as e:
-                    raise InterpolationMissingOptionError(
-                        option, section, rawval, e.args[0]) from None
+                    raise from_none(InterpolationMissingOptionError(
+                        option, section, rawval, e.args[0]))
             else:
                 break
         if value and "%(" in value:
@@ -663,7 +662,7 @@ class RawConfigParser(MutableMapping):
         try:
             opts = self._sections[section].copy()
         except KeyError:
-            raise NoSectionError(section) from None
+            raise from_none(NoSectionError(section))
         opts.update(self._defaults)
         return list(opts.keys())
 
@@ -921,7 +920,7 @@ class RawConfigParser(MutableMapping):
             try:
                 sectdict = self._sections[section]
             except KeyError:
-                raise NoSectionError(section) from None
+                raise from_none(NoSectionError(section))
         sectdict[self.optionxform(option)] = value
 
     def write(self, fp, space_around_delimiters=True):
@@ -962,7 +961,7 @@ class RawConfigParser(MutableMapping):
             try:
                 sectdict = self._sections[section]
             except KeyError:
-                raise NoSectionError(section) from None
+                raise from_none(NoSectionError(section))
         option = self.optionxform(option)
         existed = option in sectdict
         if existed:

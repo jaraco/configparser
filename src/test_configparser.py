@@ -22,7 +22,7 @@ except ImportError:
     from test import test_support as support
 
 from backports import configparser
-from backports.configparser.helpers import UserDict, PY2
+from backports.configparser.helpers import UserDict, PY2, open, str
 
 
 class SortedDict(UserDict):
@@ -630,7 +630,7 @@ boolean {0[0]} NO
         with self.assertRaises(configparser.DuplicateSectionError) as cm:
             cf.add_section("Foo")
         e = cm.exception
-        self.assertEqual(str(e), "Section {!r} already exists".format('Foo'))
+        self.assertEqual(str(e), "Section {0!r} already exists".format('Foo'))
         self.assertEqual(e.args, ("Foo", None, None))
 
         if self.strict:
@@ -644,16 +644,16 @@ boolean {0[0]} NO
                     oops{equals}this won't
                 """.format(equals=self.delimiters[0])), source='<foo-bar>')
             e = cm.exception
-            self.assertEqual(str(e), "While reading from {!r} [line  5]: "
-                                     "section {!r} already exists".format(
+            self.assertEqual(str(e), "While reading from {0!r} [line  5]: "
+                                     "section {1!r} already exists".format(
                                          '<foo-bar>', 'Foo'))
             self.assertEqual(e.args, ("Foo", '<foo-bar>', 5))
 
             with self.assertRaises(configparser.DuplicateOptionError) as cm:
                 cf.read_dict({'Bar': {'opt': 'val', 'OPT': 'is really `opt`'}})
             e = cm.exception
-            self.assertEqual(str(e), "While reading from {!r}: option {!r} "
-                                     "in section {!r} already exists".format(
+            self.assertEqual(str(e), "While reading from {0!r}: option {1!r} "
+                                     "in section {2!r} already exists".format(
                                          '<dict>', 'opt', 'Bar'))
             self.assertEqual(e.args, ("Bar", "opt", "<dict>", None))
 
@@ -1530,7 +1530,7 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         self.assertEqual(error.source, None)
         self.assertEqual(error.lineno, None)
         self.assertEqual(error.args, ('section', 'option', None, None))
-        self.assertEqual(str(error), "Option {!r} in section {!r} already "
+        self.assertEqual(str(error), "Option {0!r} in section {1!r} already "
                                      "exists".format('option', 'section'))
 
     def test_interpolation_depth_error(self):
@@ -1570,11 +1570,11 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
             parser['section']['invalid_percent']
         self.assertEqual(str(cm.exception), "'%' must be followed by '%' or "
-                                            "'(', found: {!r}".format('%'))
+                                            "'(', found: {0!r}".format('%'))
         with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
             parser['section']['invalid_reference']
         self.assertEqual(str(cm.exception), "bad interpolation variable "
-                                            "reference {!r}".format('%(()'))
+                                            "reference {0!r}".format('%(()'))
 
     def test_readfp_deprecation(self):
         sio = io.StringIO("""

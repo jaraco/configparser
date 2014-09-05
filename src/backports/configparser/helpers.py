@@ -11,6 +11,12 @@ try:
     from collections import UserDict
 except ImportError:
     from UserDict import UserDict
+
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict
+
 try:
     from thread import get_ident
 except ImportError:
@@ -20,9 +26,18 @@ except ImportError:
         from _dummy_thread import get_ident
 
 
-from future.backports.misc import OrderedDict
-from future.builtins import str
+from future.builtins import open
 from future.utils import PY2
+
+
+str = type('str')
+
+
+def from_none(exc):
+    """raise from_none(ValueError('a')) == raise ValueError('a') from None"""
+    exc.__cause__ = None
+    exc.__suppress_context__ = True
+    return exc
 
 
 # from reprlib 3.2.1

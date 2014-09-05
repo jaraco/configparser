@@ -16,10 +16,14 @@ readme_filename = os.path.join(os.path.dirname(__file__), 'README.rst')
 with codecs.open(readme_filename, encoding='utf8') as ld_file:
     long_description = ld_file.read()
 
+requirements = ['future>=0.13.0']
+
 if sys.version_info[0] == 2:
     # bail on UTF-8 and enable `import configparser` for Python 2
     author = 'Lukasz Langa'
     modules = ['configparser']
+    if sys.version_info[1] < 7:
+        requirements.append('ordereddict')
 else:
     author = 'Łukasz Langa'
     modules = []
@@ -41,7 +45,7 @@ setup(
     namespace_packages=['backports'],
     include_package_data=True,
     zip_safe=False,
-    install_requires=['future>=0.13.0'],
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
