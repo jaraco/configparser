@@ -16,7 +16,7 @@ readme_filename = os.path.join(os.path.dirname(__file__), 'README.rst')
 with codecs.open(readme_filename, encoding='utf8') as ld_file:
     long_description = ld_file.read()
 
-requirements = ['future>=0.13.0']
+requirements = []
 
 if sys.version_info[0] == 2:
     # bail on UTF-8 and enable `import configparser` for Python 2
@@ -30,7 +30,7 @@ else:
 
 setup(
     name='configparser',
-    version='3.5.0b1',
+    version='3.5.0b2',
     author=author,
     author_email='lukasz@langa.pl',
     description=__doc__,

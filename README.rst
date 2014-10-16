@@ -166,6 +166,19 @@ Change Log
 
 * fixes `BitBucket issue #6
   <https://bitbucket.org/ambv/configparser/issue/6>`_: PyPy compatibility
+
+3.5.0b2
+~~~~~~~
+
+* second beta of 3.5.0, not using any third-party futurization libraries
+
+3.5.0b1
+~~~~~~~
+
+* first beta of 3.5.0, using python-future
+
+* for the full feature list, see `3.5.0`_
+
 3.3.0r2
 ~~~~~~~
 

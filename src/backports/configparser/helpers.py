@@ -17,6 +17,8 @@ try:
 except ImportError:
     from ordereddict import OrderedDict
 
+from io import open
+import sys
 try:
     from thread import get_ident
 except ImportError:
@@ -26,9 +28,8 @@ except ImportError:
         from _dummy_thread import get_ident
 
 
-from future.builtins import open
-from future.utils import PY2
-
+PY2 = sys.version_info[0] == 2
+PY3 = sys.version_info[0] == 3
 
 str = type('str')
 
