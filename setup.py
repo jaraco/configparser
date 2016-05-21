@@ -30,7 +30,7 @@ else:
 
 setup(
     name='configparser',
-    version='3.5.0b2',
+    version='3.5.0',
     author=author,
     author_email='lukasz@langa.pl',
     description=__doc__,
@@ -57,9 +57,8 @@ setup(
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],

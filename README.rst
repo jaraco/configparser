@@ -149,8 +149,7 @@ Change Log
   2.6 - 3.5. To use on Python 3 import ``from backports import configparser``
   instead of the built-in version.
 
-* compatible with 3.4.1 + fixes for `#19546
-  <http://bugs.python.org/issue19546>`_
+* compatible with 3.5.1
 
 * fixes `BitBucket issue #1
   <https://bitbucket.org/ambv/configparser/issue/1>`_: versioning non-compliant
@@ -257,15 +256,20 @@ conversion was not doable, I took the following branching approach:
 
 The process works like this:
 
-1. I update the ``3.x`` branch with new versions of files. Commit.
+1. I update the ``3.x`` branch with new versions of files.  Note that the
+   actual ``configparser.py`` file is now just a proxy for sources held in
+   ``backports/configparser/__init__.py``.
 
-2. I merge the new commit to ``default``. I run ``tox``. Commit.
+2. I check for new names in ``__all__`` and update imports in
+   ``configparser.py`` accordingly. I run the tests on Python 3. Commit.
 
-3. If there are necessary changes, I do them now (on ``default``). Note that
+3. I merge the new commit to ``default``. I run ``tox``. Commit.
+
+4. If there are necessary changes, I do them now (on ``default``). Note that
    the changes should be written in the syntax subset supported by Python
    2.6.
 
-4. I run ``tox``. If it works, I update the docs and release the new version.
+5. I run ``tox``. If it works, I update the docs and release the new version.
    Otherwise, I go back to point 3. I might use ``pasteurize`` to suggest me
    required changes but usually I do them manually to keep resulting code in
    a nicer form.
