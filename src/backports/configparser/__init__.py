@@ -684,7 +684,7 @@ class RawConfigParser(MutableMapping):
 
         Return list of successfully read files.
         """
-        if PY2 and isinstance(filenames, bytes):
+        if PY2 and isinstance(filenames, bytes) and sys.py3kwarning:
             # we allow for a little unholy magic for Python 2 so that
             # people not using unicode_literals can still use the library
             # conveniently
