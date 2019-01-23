@@ -30,7 +30,7 @@ else:
 
 setup(
     name='configparser',
-    version='3.5.0',
+    version='3.6.0',
     author=author,
     author_email='lukasz@langa.pl',
     description=__doc__,
@@ -42,7 +42,6 @@ setup(
     py_modules=modules,
     package_dir={'': 'src'},
     packages=find_packages('src'),
-    namespace_packages=['backports'],
     include_package_data=True,
     zip_safe=False,
     install_requires=requirements,
