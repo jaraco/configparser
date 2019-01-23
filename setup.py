@@ -30,12 +30,14 @@ else:
 
 setup(
     name='configparser',
-    version='3.6.0',
+    version='3.5.1',
     author=author,
     author_email='lukasz@langa.pl',
+    maintainer='Jason R. Coombs',
+    maintainer_email='jaraco@jaraco.com',
     description=__doc__,
     long_description=long_description,
-    url='http://docs.python.org/3/library/configparser.html',
+    url='https://github.com/jaraco/configparser/',
     keywords='configparser ini parsing conf cfg configuration file',
     platforms=['any'],
     license='MIT',

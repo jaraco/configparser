@@ -132,15 +132,26 @@ backport releases done in the mean time.
 Maintenance
 -----------
 
-This backport is maintained on BitBucket by Łukasz Langa, the current vanilla
-``configparser`` maintainer for CPython:
+This backport was originally authored by Łukasz Langa, the current vanilla
+``configparser`` maintainer for CPython and is currently maintained by
+Jason R. Coombs:
 
-* `configparser Mercurial repository <https://bitbucket.org/ambv/configparser>`_
+* `configparser repository <https://github.com/jaraco/configparser>`_
 
-* `configparser issue tracker <https://bitbucket.org/ambv/configparser/issues>`_
+* `configparser issue tracker <https://github.com/jaraco/configparser/issues>`_
 
 Change Log
 ----------
+
+3.5.1
+~~~~~
+
+* jaraco adopts the package.
+
+* Moved hosting to GitHub.
+
+* Issue #21: Updated ``backports`` namespace package to conform with other
+  packages sharing the namespace.
 
 3.5.0
 ~~~~~
@@ -248,7 +259,7 @@ conversion was not doable, I took the following branching approach:
   CPython repository. The synchronization is currently done by manually copying
   the required files and stating from which CPython changeset they come from.
 
-* the ``default`` branch holds a version of the ``3.x`` code with some tweaks
+* the ``master`` branch holds a version of the ``3.x`` code with some tweaks
   that make it independent from libraries and constructions unavailable on 2.x.
   Code on this branch still *must* work on the corresponding Python 3.x but
   will also work on Python 2.6 and 2.7 (including PyPy).  You can check this
@@ -263,9 +274,9 @@ The process works like this:
 2. I check for new names in ``__all__`` and update imports in
    ``configparser.py`` accordingly. I run the tests on Python 3. Commit.
 
-3. I merge the new commit to ``default``. I run ``tox``. Commit.
+3. I merge the new commit to ``master``. I run ``tox``. Commit.
 
-4. If there are necessary changes, I do them now (on ``default``). Note that
+4. If there are necessary changes, I do them now (on ``master``). Note that
    the changes should be written in the syntax subset supported by Python
    2.6.
 
