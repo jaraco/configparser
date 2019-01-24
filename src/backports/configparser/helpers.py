@@ -21,6 +21,11 @@ except ImportError:
     from ordereddict import OrderedDict
 
 try:
+    import builtins
+except ImportError:
+    import __builtin__ as builtins
+
+try:
     import pathlib
 except ImportError:
     pathlib = None
@@ -179,7 +184,18 @@ except ImportError:
     ChainMap = _ChainMap
 
 
-class _PathLike(abc.ABC):
+_ABC = getattr(
+    abc, 'ABC',
+    # Python 3.3 compatibility
+    abc.ABCMeta(
+        builtins.str('__ABC'),
+        (object,),
+        dict(__metaclass__=abc.ABCMeta),
+    ),
+)
+
+
+class _PathLike(_ABC):
 
     """Abstract base class for implementing the file system path protocol."""
 
@@ -190,10 +206,10 @@ class _PathLike(abc.ABC):
 
     @classmethod
     def __subclasshook__(cls, subclass):
-        return (
+        return bool(
             hasattr(subclass, '__fspath__')
             # workaround for Python 3.5
-            or issubclass(subclass, pathlib.Path)
+            or pathlib and issubclass(subclass, pathlib.Path)
         )
 
 
