@@ -21,6 +21,11 @@ try:
 except ImportError:
     from test import test_support as support
 
+try:
+    import pathlib
+except ImportError:
+    import pathlib2 as pathlib
+
 from backports import configparser
 from backports.configparser.helpers import UserDict, PY2, open, str
 
@@ -79,6 +84,7 @@ class CfgParserTestCaseClass(object):
         cf = self.newconfig(defaults)
         cf.read_string(string)
         return cf
+
 
 class BasicTestCase(CfgParserTestCaseClass):
 
@@ -739,6 +745,16 @@ boolean {0[0]} NO
         parsed_files = cf.read(file1)
         self.assertEqual(parsed_files, [file1])
         self.assertEqual(cf.get("Foo Bar", "foo"), "newbar")
+        # check when we pass only a Path object:
+        cf = self.newconfig()
+        parsed_files = cf.read(pathlib.Path(file1))
+        self.assertEqual(parsed_files, [file1])
+        self.assertEqual(cf.get("Foo Bar", "foo"), "newbar")
+        # check when we passed both a filename and a Path object:
+        cf = self.newconfig()
+        parsed_files = cf.read([pathlib.Path(file1), file1])
+        self.assertEqual(parsed_files, [file1, file1])
+        self.assertEqual(cf.get("Foo Bar", "foo"), "newbar")
         # check when we pass only missing files:
         cf = self.newconfig()
         parsed_files = cf.read(["nonexistent-file"])
@@ -747,6 +763,23 @@ boolean {0[0]} NO
         cf = self.newconfig()
         parsed_files = cf.read([])
         self.assertEqual(parsed_files, [])
+
+    def test_read_returns_file_list_with_bytestring_path(self):
+        if self.delimiters[0] != '=':
+            self.skipTest('incompatible format')
+        file1_bytestring = support.findfile("cfgparser.1").encode()
+        # check when passing an existing bytestring path
+        cf = self.newconfig()
+        parsed_files = cf.read(file1_bytestring)
+        self.assertEqual(parsed_files, [file1_bytestring])
+        # check when passing an non-existing bytestring path
+        cf = self.newconfig()
+        parsed_files = cf.read(b'nonexistent-file')
+        self.assertEqual(parsed_files, [])
+        # check when passing both an existing and non-existing bytestring path
+        cf = self.newconfig()
+        parsed_files = cf.read([file1_bytestring, b'nonexistent-file'])
+        self.assertEqual(parsed_files, [file1_bytestring])
 
     # shared by subclasses
     def get_interpolation_config(self):
@@ -849,6 +882,21 @@ boolean {0[0]} NO
         self.assertEqual(set(cf['section3'].keys()), set())
         self.assertEqual(cf.sections(), ['section1', 'section2', 'section3'])
 
+    def test_invalid_multiline_value(self):
+        if self.allow_no_value:
+            self.skipTest('if no_value is allowed, ParsingError is not raised')
+
+        invalid = textwrap.dedent("""\
+            [DEFAULT]
+            test {0} test
+            invalid""".format(self.delimiters[0])
+        )
+        cf = self.newconfig()
+        with self.assertRaises(configparser.ParsingError):
+            cf.read_string(invalid)
+        self.assertEqual(cf.get('DEFAULT', 'test'), 'test')
+        self.assertEqual(cf['DEFAULT']['test'], 'test')
+
 
 class StrictTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.RawConfigParser
@@ -944,6 +992,15 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
         cf = self.newconfig()
         self.assertRaises(ValueError, cf.add_section, self.default_section)
 
+    def test_defaults_keyword(self):
+        """bpo-23835 fix for ConfigParser"""
+        cf = self.newconfig(defaults={1: 2.4})
+        self.assertEqual(cf[self.default_section]['1'], '2.4')
+        self.assertAlmostEqual(cf[self.default_section].getfloat('1'), 2.4)
+        cf = self.newconfig(defaults={"A": 5.2})
+        self.assertEqual(cf[self.default_section]['a'], '5.2')
+        self.assertAlmostEqual(cf[self.default_section].getfloat('a'), 5.2)
+
 
 class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
@@ -1002,13 +1059,16 @@ class ConfigParserTestCaseLegacyInterpolation(ConfigParserTestCase, unittest.Tes
         cf.set("sect", "option2", "foo%%bar")
         self.assertEqual(cf.get("sect", "option2"), "foo%%bar")
 
+
 class ConfigParserTestCaseNonStandardDelimiters(ConfigParserTestCase, unittest.TestCase):
     delimiters = (':=', '$')
     comment_prefixes = ('//', '"')
     inline_comment_prefixes = ('//', '"')
 
+
 class ConfigParserTestCaseNonStandardDefaultSection(ConfigParserTestCase, unittest.TestCase):
     default_section = 'general'
+
 
 class MultilineValuesTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
@@ -1037,6 +1097,7 @@ class MultilineValuesTestCase(BasicTestCase, unittest.TestCase):
             cf_from_file.read_file(f)
         self.assertEqual(cf_from_file.get('section8', 'lovely_spam4'),
                          self.wonderful_spam.replace('\t\n', '\n'))
+
 
 class RawConfigParserTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.RawConfigParser
@@ -1080,10 +1141,21 @@ class RawConfigParserTestCase(BasicTestCase, unittest.TestCase):
             cf.set('non-string', 1, 1)
             self.assertEqual(cf.get('non-string', 1), 1)
 
+    def test_defaults_keyword(self):
+        """bpo-23835 legacy behavior for RawConfigParser"""
+        with self.assertRaises(AttributeError) as ctx:
+            self.newconfig(defaults={1: 2.4})
+        err = ctx.exception
+        self.assertEqual(str(err), "'int' object has no attribute 'lower'")
+        cf = self.newconfig(defaults={"A": 5.2})
+        self.assertAlmostEqual(cf[self.default_section]['a'], 5.2)
+
+
 class RawConfigParserTestCaseNonStandardDelimiters(RawConfigParserTestCase):
     delimiters = (':=', '$')
     comment_prefixes = ('//', '"')
     inline_comment_prefixes = ('//', '"')
+
 
 class RawConfigParserTestSambaConf(CfgParserTestCaseClass, unittest.TestCase):
     config_class = configparser.RawConfigParser
@@ -1278,6 +1350,7 @@ class ConfigParserTestCaseExtendedInterpolation(BasicTestCase, unittest.TestCase
 
 class ConfigParserTestCaseNoValue(ConfigParserTestCase):
     allow_no_value = True
+
 
 class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass, unittest.TestCase):
     config_class = configparser.ConfigParser
@@ -2073,6 +2146,10 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
             self.assertEqual(cfg['two'].getlen('one'), 5)
 
 
+class MiscTestCase(unittest.TestCase):
+    def test__all__(self):
+        blacklist = {"Error", "PY2"}
+        support.check__all__(self, configparser, blacklist=blacklist)
 
 
 class UnicodeBackportTestCase(unittest.TestCase):

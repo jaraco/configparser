@@ -64,7 +64,7 @@ ConfigParser -- responsible for parsing a list of
         Return list of configuration options for the named section.
 
     read(filenames, encoding=None)
-        Read and parse the list of named configuration files, given by
+        Read and parse the iterable of named configuration files, given by
         name.  A single filename is also allowed.  Non-existing files
         are ignored.  Return list of successfully read files.
 
@@ -131,6 +131,7 @@ from collections import MutableMapping
 import functools
 import io
 import itertools
+import os
 import re
 import sys
 import warnings
@@ -606,9 +607,6 @@ class RawConfigParser(MutableMapping):
         self._converters = ConverterMapping(self)
         self._proxies = self._dict()
         self._proxies[default_section] = SectionProxy(self, default_section)
-        if defaults:
-            for key, value in defaults.items():
-                self._defaults[self.optionxform(key)] = value
         self._delimiters = tuple(delimiters)
         if delimiters == ('=', ':'):
             self._optcre = self.OPTCRE_NV if allow_no_value else self.OPTCRE
@@ -633,6 +631,8 @@ class RawConfigParser(MutableMapping):
             self._interpolation = Interpolation()
         if converters is not _UNSET:
             self._converters.update(converters)
+        if defaults:
+            self._read_defaults(defaults)
 
     def defaults(self):
         return self._defaults
@@ -673,13 +673,13 @@ class RawConfigParser(MutableMapping):
         return list(opts.keys())
 
     def read(self, filenames, encoding=None):
-        """Read and parse a filename or a list of filenames.
+        """Read and parse a filename or an iterable of filenames.
 
         Files that cannot be opened are silently ignored; this is
-        designed so that you can specify a list of potential
+        designed so that you can specify an iterable of potential
         configuration file locations (e.g. current directory, user's
         home directory, systemwide directory), and all existing
-        configuration files in the list will be read.  A single
+        configuration files in the iterable will be read.  A single
         filename may also be given.
 
         Return list of successfully read files.
@@ -696,7 +696,7 @@ class RawConfigParser(MutableMapping):
                 stacklevel=2,
             )
             filenames = [filenames]
-        elif isinstance(filenames, str):
+        elif isinstance(filenames, (str, bytes, os.PathLike)):
             filenames = [filenames]
         read_ok = []
         for filename in filenames:
@@ -705,6 +705,8 @@ class RawConfigParser(MutableMapping):
                     self._read(fp, filename)
             except IOError:
                 continue
+            if isinstance(filename, os.PathLike):
+                filename = os.fspath(filename)
             read_ok.append(filename)
         return read_ok
 
@@ -1126,10 +1128,10 @@ class RawConfigParser(MutableMapping):
                         # raised at the end of the file and will contain a
                         # list of all bogus lines
                         e = self._handle_error(e, fpname, lineno, line)
+        self._join_multiline_values()
         # if any parsing errors occurred, raise an exception
         if e:
             raise e
-        self._join_multiline_values()
 
     def _join_multiline_values(self):
         defaults = self.default_section, self._defaults
@@ -1142,6 +1144,12 @@ class RawConfigParser(MutableMapping):
                 options[name] = self._interpolation.before_read(self,
                                                                 section,
                                                                 name, val)
+
+    def _read_defaults(self, defaults):
+        """Read the defaults passed in the initializer.
+        Note: values can be non-string."""
+        for key, value in defaults.items():
+            self._defaults[self.optionxform(key)] = value
 
     def _handle_error(self, exc, fpname, lineno, line):
         if not exc:
@@ -1159,7 +1167,7 @@ class RawConfigParser(MutableMapping):
             sectiondict = self._sections[section]
         except KeyError:
             if section != self.default_section:
-                raise NoSectionError(section)
+                raise NoSectionError(section) from None
         # Update with the entry specific variables
         vardict = {}
         if vars:
@@ -1244,6 +1252,19 @@ class ConfigParser(RawConfigParser):
         a string."""
         section, _, _ = self._validate_value_types(section=section)
         super(ConfigParser, self).add_section(section)
+
+    def _read_defaults(self, defaults):
+        """Reads the defaults passed in the initializer, implicitly converting
+        values to strings like the rest of the API.
+
+        Does not perform interpolation for backwards compatibility.
+        """
+        try:
+            hold_interpolation = self._interpolation
+            self._interpolation = Interpolation()
+            self.read_dict({self.default_section: defaults})
+        finally:
+            self._interpolation = hold_interpolation
 
 
 class SafeConfigParser(ConfigParser):
