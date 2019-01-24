@@ -139,6 +139,7 @@ import warnings
 from backports.configparser.helpers import OrderedDict as _default_dict
 from backports.configparser.helpers import ChainMap as _ChainMap
 from backports.configparser.helpers import from_none, open, str, PY2
+from backports.configparser.helpers import PathLike, fspath
 
 __all__ = ["NoSectionError", "DuplicateOptionError", "DuplicateSectionError",
            "NoOptionError", "InterpolationError", "InterpolationDepthError",
@@ -695,18 +696,18 @@ class RawConfigParser(MutableMapping):
                 DeprecationWarning,
                 stacklevel=2,
             )
-            filenames = [filenames]
-        elif isinstance(filenames, (str, bytes, os.PathLike)):
+
+        if isinstance(filenames, (str, bytes, PathLike)):
             filenames = [filenames]
         read_ok = []
         for filename in filenames:
+            if isinstance(filename, PathLike):
+                filename = fspath(filename)
             try:
                 with open(filename, encoding=encoding) as fp:
                     self._read(fp, filename)
             except IOError:
                 continue
-            if isinstance(filename, os.PathLike):
-                filename = os.fspath(filename)
             read_ok.append(filename)
         return read_ok
 
