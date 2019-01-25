@@ -143,6 +143,15 @@ Jason R. Coombs:
 Change Log
 ----------
 
+3.7.0
+~~~~~
+
+* Merge functionality from Python 3.7.2. Now ConfigParser accepts bytes
+  paths as well as any
+  `PathLike <https://docs.python.org/3/library/os.html#os.PathLike>`_
+  object, including those found in the `pathlib2 backport
+  <https://pypi.org/project/pathlib2/>`.
+
 3.5.2
 ~~~~~
 
