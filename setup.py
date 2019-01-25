@@ -16,14 +16,10 @@ readme_filename = os.path.join(os.path.dirname(__file__), 'README.rst')
 with codecs.open(readme_filename, encoding='utf8') as ld_file:
     long_description = ld_file.read()
 
-requirements = []
-
 if sys.version_info[0] == 2:
     # bail on UTF-8 and enable `import configparser` for Python 2
     author = 'Lukasz Langa'
     modules = ['configparser']
-    if sys.version_info[1] < 7:
-        requirements.append('ordereddict')
 else:
     author = 'Łukasz Langa'
     modules = []
@@ -40,13 +36,12 @@ setup(
     url='https://github.com/jaraco/configparser/',
     keywords='configparser ini parsing conf cfg configuration file',
     platforms=['any'],
-    license='MIT',
     py_modules=modules,
     package_dir={'': 'src'},
     packages=find_packages('src'),
     include_package_data=True,
     zip_safe=False,
-    install_requires=requirements,
+    extras_require={':python_version=="2.6"': ['ordereddict']},
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
@@ -60,7 +55,10 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
+    python_requires=">=2.6",
 )
