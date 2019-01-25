@@ -2152,7 +2152,8 @@ class MiscTestCase(unittest.TestCase):
         "check__all__ not available",
     )
     def test__all__(self):
-        blacklist = {"Error", "PY2"}
+        # blacklist = {"Error", "PY2"}
+        blacklist = set(["Error", "PY2"])
         support.check__all__(self, configparser, blacklist=blacklist)
 
 
