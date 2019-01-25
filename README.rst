@@ -143,6 +143,11 @@ Jason R. Coombs:
 Change Log
 ----------
 
+3.7.1
+~~~~~
+
+* Issue #30: Fixed issue on Python 2.x when future is present.
+
 3.7.0
 ~~~~~
 
