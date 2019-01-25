@@ -21,11 +21,6 @@ except ImportError:
     from ordereddict import OrderedDict
 
 try:
-    import builtins
-except ImportError:
-    import __builtin__ as builtins
-
-try:
     import pathlib
 except ImportError:
     pathlib = None
@@ -44,6 +39,7 @@ except ImportError:
 PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 
+native_str = str
 str = type('str')
 
 
@@ -188,7 +184,7 @@ _ABC = getattr(
     abc, 'ABC',
     # Python 3.3 compatibility
     abc.ABCMeta(
-        builtins.str('__ABC'),
+        native_str('__ABC'),
         (object,),
         dict(__metaclass__=abc.ABCMeta),
     ),
