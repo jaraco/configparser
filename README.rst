@@ -143,6 +143,16 @@ Jason R. Coombs:
 Change Log
 ----------
 
+3.5.2
+~~~~~
+
+* Issue #23: Use environment markers to indicate the 'ordereddict' dependency
+  for Python 2.6.
+
+* Issue #24: Limit DeprecationWarning when a filename is indicated as a
+  bytestring on Python 2. Now the warning is only emitted when py3kwarning
+  is indicated.
+
 3.5.1
 ~~~~~
 
