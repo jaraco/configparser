@@ -20,6 +20,9 @@ gh_api = sessions.BaseUrlSession(
 file_map = {
     'Lib/configparser.py': 'src/backports/configparser/__init__.py',
     'Lib/test/test_configparser.py': 'src/test_configparser.py',
+    'Lib/test/cfgparser.1': 'src/cfgparser.1',
+    'Lib/test/cfgparser.2': 'src/cfgparser.2',
+    'Lib/test/cfgparser.3': 'src/cfgparser.3',
     'Doc/library/configparser.rst': 'configparser.rst',
 }
 
