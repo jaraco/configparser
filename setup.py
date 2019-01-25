@@ -36,7 +36,6 @@ setup(
     url='https://github.com/jaraco/configparser/',
     keywords='configparser ini parsing conf cfg configuration file',
     platforms=['any'],
-    license='MIT',
     py_modules=modules,
     package_dir={'': 'src'},
     packages=find_packages('src'),
