@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""This library brings the updated configparser from Python 3.5 to Python 2.6-3.5."""
+"""Updated configparser from Python 3.7 for Python 2.6+."""
 
 from __future__ import absolute_import
 from __future__ import division
