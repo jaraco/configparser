@@ -26,7 +26,7 @@ else:
 
 setup(
     name='configparser',
-    version='3.5.2',
+    version='3.7.0',
     author=author,
     author_email='lukasz@langa.pl',
     maintainer='Jason R. Coombs',
