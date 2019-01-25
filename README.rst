@@ -143,12 +143,6 @@ Jason R. Coombs:
 Change Log
 ----------
 
-3.5.3
-~~~~~
-
-* Issue #27: Reverted the limit on DeprecationWarning, as it had unintended
-  consequences.
-
 3.7.0
 ~~~~~
 
@@ -157,6 +151,12 @@ Change Log
   `PathLike <https://docs.python.org/3/library/os.html#os.PathLike>`_
   object, including those found in the `pathlib2 backport
   <https://pypi.org/project/pathlib2/>`.
+
+3.5.3
+~~~~~
+
+* Issue #27: Reverted the limit on DeprecationWarning, as it had unintended
+  consequences.
 
 3.5.2
 ~~~~~
