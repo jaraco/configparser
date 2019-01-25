@@ -143,6 +143,12 @@ Jason R. Coombs:
 Change Log
 ----------
 
+3.5.3
+~~~~~
+
+* Issue #27: Reverted the limit on DeprecationWarning, as it had unintended
+  consequences.
+
 3.7.0
 ~~~~~
 
