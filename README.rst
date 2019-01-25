@@ -286,9 +286,10 @@ conversion was not doable, I took the following branching approach:
 
 The process works like this:
 
-1. I update the ``3.x`` branch with new versions of files.  Note that the
-   actual ``configparser.py`` file is now just a proxy for sources held in
-   ``backports/configparser/__init__.py``.
+1. In the ``3.x`` branch, run ``pip-run -- sync-upstream.py``, which
+   downloads the latest stable release of Python and copies the relevant
+   files from there into their new locations here and then commits those
+   changes with a nice reference to the relevant upstream commit hash.
 
 2. I check for new names in ``__all__`` and update imports in
    ``configparser.py`` accordingly. I run the tests on Python 3. Commit.
