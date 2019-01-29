@@ -9,7 +9,11 @@ from __future__ import unicode_literals
 import abc
 import os
 
-from collections import MutableMapping
+try:
+    from collections.abc import MutableMapping
+except ImportError:
+    from collections import MutableMapping
+
 try:
     from collections import UserDict
 except ImportError:
