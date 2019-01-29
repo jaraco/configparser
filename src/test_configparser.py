@@ -30,6 +30,11 @@ from backports import configparser
 from backports.configparser.helpers import UserDict, PY2, open, str
 
 
+def nice_literals(str):
+    "Remove b and u prefixes from reprs"
+    return str.replace("b'", "'").replace("u'", "'")
+
+
 class SortedDict(UserDict):
 
     def items(self):
@@ -1555,8 +1560,8 @@ class ReadFileTestCase(unittest.TestCase):
         with self.assertRaises(configparser.DuplicateSectionError) as dse:
             parser.read_file(lines, source=b"badbad")
         self.assertEqual(
-            str(dse.exception),
-            "While reading from b'badbad' [line  2]: section 'badbad' "
+            nice_literals(str(dse.exception)),
+            "While reading from 'badbad' [line  2]: section 'badbad' "
             "already exists"
         )
         lines = textwrap.dedent("""
@@ -1567,9 +1572,13 @@ class ReadFileTestCase(unittest.TestCase):
         with self.assertRaises(configparser.DuplicateOptionError) as dse:
             parser.read_file(lines, source=b"badbad")
         self.assertEqual(
-            str(dse.exception),
-            "While reading from b'badbad' [line  3]: option 'bad' in section "
+            nice_literals(str(dse.exception)),
+            "While reading from 'badbad' [line  3]: option 'bad' in section "
             "'badbad' already exists"
+        ) or self.assertEqual(
+            nice_literals(str(dse.exception)),
+            "While reading from 'badbad' [line  3]: option 'bad' in section "
+            "'badbad' already exists",
         )
         lines = textwrap.dedent("""
         [badbad]
@@ -1578,8 +1587,8 @@ class ReadFileTestCase(unittest.TestCase):
         with self.assertRaises(configparser.ParsingError) as dse:
             parser.read_file(lines, source=b"badbad")
         self.assertEqual(
-            str(dse.exception),
-            "Source contains parsing errors: b'badbad'\n\t[line  2]: '= bad'"
+            nice_literals(str(dse.exception)),
+            "Source contains parsing errors: 'badbad'\n\t[line  2]: '= bad'"
         )
         lines = textwrap.dedent("""
         [badbad
@@ -1588,8 +1597,8 @@ class ReadFileTestCase(unittest.TestCase):
         with self.assertRaises(configparser.MissingSectionHeaderError) as dse:
             parser.read_file(lines, source=b"badbad")
         self.assertEqual(
-            str(dse.exception),
-            "File contains no section headers.\nfile: b'badbad', line: 1\n"
+            nice_literals(str(dse.exception)),
+            "File contains no section headers.\nfile: 'badbad', line: 1\n"
             "'[badbad'"
         )
 
