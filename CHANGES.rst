@@ -47,20 +47,13 @@
 
 * compatible with 3.5.1
 
-* fixes `BitBucket issue #1
-  <https://bitbucket.org/ambv/configparser/issue/1>`_: versioning non-compliant
-  with PEP 386
+* fixes #1: versioning non-compliant with PEP 386
 
-* fixes `BitBucket issue #3
-  <https://bitbucket.org/ambv/configparser/issue/3>`_: ``reload(sys);
-  sys.setdefaultencoding('utf8')`` in setup.py
+* fixes #3: ``reload(sys); sys.setdefaultencoding('utf8')`` in setup.py
 
-* fixes `BitBucket issue #5
-  <https://bitbucket.org/ambv/configparser/issue/5>`_: Installing the backport
-  on Python 3 breaks virtualenv
+* fixes #5: Installing the backport on Python 3 breaks virtualenv
 
-* fixes `BitBucket issue #6
-  <https://bitbucket.org/ambv/configparser/issue/6>`_: PyPy compatibility
+* fixes #6: PyPy compatibility
 
 3.5.0b2
 =======
@@ -77,18 +70,16 @@
 3.3.0r2
 =======
 
-* updated the fix for `#16820 <http://bugs.python.org/issue16820>`_: parsers
+* updated the fix for Python #16820: parsers
   now preserve section order when using ``__setitem__`` and ``update``
 
 3.3.0r1
 =======
 
-* compatible with 3.3.0 + fixes for `#15803
-  <http://bugs.python.org/issue15803>`_ and `#16820
-  <http://bugs.python.org/issue16820>`_
+* compatible with 3.3.0 + fixes for Python #15803
+  and Python #16820
 
-* fixes `BitBucket issue #4
-  <https://bitbucket.org/ambv/configparser/issue/4>`_: ``read()`` properly
+* fixes #4: ``read()`` properly
   treats a bytestring argument as a filename
 
 * `ordereddict <http://pypi.python.org/pypi/ordereddict>`_ dependency required
@@ -124,7 +115,5 @@
 3.2.0r1
 =======
 
-* the first public release compatible with 3.2.0 + fixes for `#11324
-  <http://bugs.python.org/issue11324>`_, `#11670
-  <http://bugs.python.org/issue11670>`_ and `#11858
-  <http://bugs.python.org/issue11858>`_.
+* the first public release compatible with 3.2.0 + fixes for
+  Python #11324, Python #11670, and Python #11858.
