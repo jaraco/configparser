@@ -4,6 +4,13 @@
 * Repackaged using setuptools_scm for file discovery and other features
   from `skeleton <https://pypi.org/project/skeleton`_. Fixes #33.
 
+* Package now unconditionally installs the  ``configparser`` module.
+  Doing so allowed for the project to release a universal wheel for
+  Python 2 and Python 3. Even though the ``configparser`` module is
+  installed unconditionally on Python 3, it's expected that it will be
+  masked in that environment by the module in stdlib, so the same
+  interface applies. Ref #31.
+
 3.7.1
 =====
 
