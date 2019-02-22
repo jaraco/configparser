@@ -1,5 +1,7 @@
-3.8.0
+3.7.2
 =====
+
+(also released as 3.8.0)
 
 * Repackaged using setuptools_scm for file discovery and other features
   from `skeleton <https://pypi.org/project/skeleton`_. Fixes #33.
