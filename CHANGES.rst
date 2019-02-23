@@ -1,3 +1,8 @@
+3.7.3
+=====
+
+* Issue #34: Temporarily degrade to use ASCII for author's name.
+
 3.7.2
 =====
 
