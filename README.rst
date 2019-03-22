@@ -12,9 +12,9 @@
 .. image:: https://readthedocs.org/projects/configparser/badge/?version=latest
    :target: https://configparser.readthedocs.io/en/latest/?badge=latest
 
-============
-configparser
-============
+.. image:: https://tidelift.com/badges/github/jaraco/configparser
+   :target: https://tidelift.com/subscription/pkg/pypi-configparser?utm_source=pypi-configparser&utm_medium=readme
+
 
 The ancient ``ConfigParser`` module available in the standard library 2.x has
 seen a major update in Python 3.2. This is a backport of those changes so that
@@ -154,6 +154,12 @@ Jason R. Coombs:
 
 * `configparser issue tracker <https://github.com/jaraco/configparser/issues>`_
 
+Security Contact
+----------------
+
+To report a security vulnerability, please use the
+`Tidelift security contact <https://tidelift.com/security>`_.
+Tidelift will coordinate the fix and disclosure.
 
 Conversion Process
 ------------------

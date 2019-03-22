@@ -5,6 +5,11 @@ extensions = ["sphinx.ext.autodoc", "jaraco.packaging.sphinx", "rst.linker"]
 
 master_doc = "index"
 
+# Custom sidebar templates, maps document names to template names.
+html_theme = 'alabaster'
+templates_path = ['_templates']
+html_sidebars = {'index': 'tidelift-sidebar.html'}
+
 link_files = {
     "../CHANGES.rst": dict(
         using=dict(GH="https://github.com"),
