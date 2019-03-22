@@ -9,8 +9,8 @@
 .. .. image:: https://img.shields.io/appveyor/ci/jaraco/configparser/master.svg
 ..    :target: https://ci.appveyor.com/project/jaraco/configparser/branch/master
 
-.. .. image:: https://readthedocs.org/projects/configparser/badge/?version=latest
-..    :target: https://configparser.readthedocs.io/en/latest/?badge=latest
+.. image:: https://readthedocs.org/projects/configparser/badge/?version=latest
+   :target: https://configparser.readthedocs.io/en/latest/?badge=latest
 
 ============
 configparser
