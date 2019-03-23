@@ -1,3 +1,9 @@
+3.7.4
+=====
+
+* Project is now officially supported through
+  `Tidelift <https://tidelift.com/subscription/pkg/pypi-configparser?utm_source=pypi-configparser&utm_medium=readme>`_.
+
 3.7.3
 =====
 
