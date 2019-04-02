@@ -38,6 +38,9 @@
   object, including those found in the `pathlib2 backport
   <https://pypi.org/project/pathlib2/>`.
 
+* Project now uses declarative config for package metadata, meaning it
+  requires install from wheel or build using Setuptools 30.4 or later.
+
 3.5.3
 =====
 
