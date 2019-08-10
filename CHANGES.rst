@@ -1,3 +1,8 @@
+3.7.5
+=====
+
+* Synced project with Python 3.7.4 (no meaningful changes).
+
 3.7.4
 =====
 
