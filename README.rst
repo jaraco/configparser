@@ -169,8 +169,8 @@ this backport is produced. If the implementation details of this backport are
 not important for you, feel free to ignore the following content.
 
 ``configparser`` is converted using `python-future
-<http://python-future.org>`_ and free time.  Because a fully automatic
-conversion was not doable, I took the following branching approach:
+<http://python-future.org>`_. The project takes the following
+branching approach:
 
 * the ``3.x`` branch holds unchanged files synchronized from the upstream
   CPython repository. The synchronization is currently done by manually copying
