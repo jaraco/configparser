@@ -36,9 +36,10 @@ def is_stable(tag):
 
 
 @autocommand.autocommand(__name__)
-def run():
+def run(pre=False):
     tags = gh_api.get('tags').json()
-    tag = max(filter(is_stable, tags), key=by_tag)
+    filtered = tags if pre else filter(is_stable, tags)
+    tag = max(filtered, key=by_tag)
     version = tag['name']
     for src, dst in file_map.items():
         resp = gh_content.get(f'{version}/{src}')
