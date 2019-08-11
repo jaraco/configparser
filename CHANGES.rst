@@ -1,3 +1,9 @@
+3.8.1
+=====
+
+* Synced with `Python 3.8.0b3
+  <https://docs.python.org/3.8/whatsnew/changelog.html#python-3-8-0-beta-3>`_.
+
 3.7.5
 =====
 
