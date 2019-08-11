@@ -52,6 +52,25 @@ ConfigParser -- responsible for parsing a list of
         When `allow_no_value' is True (default: False), options without
         values are accepted; the value presented for these is None.
 
+        When `default_section' is given, the name of the special section is
+        named accordingly. By default it is called ``"DEFAULT"`` but this can
+        be customized to point to any other valid section name. Its current
+        value can be retrieved using the ``parser_instance.default_section``
+        attribute and may be modified at runtime.
+
+        When `interpolation` is given, it should be an Interpolation subclass
+        instance. It will be used as the handler for option value
+        pre-processing when using getters. RawConfigParser objects don't do
+        any sort of interpolation, whereas ConfigParser uses an instance of
+        BasicInterpolation. The library also provides a ``zc.buildbot``
+        inspired ExtendedInterpolation implementation.
+
+        When `converters` is given, it should be a dictionary where each key
+        represents the name of a type converter and each value is a callable
+        implementing the conversion from string to the desired datatype. Every
+        converter gets its corresponding get*() method on the parser object and
+        section proxies.
+
     sections()
         Return all the configuration section names, sans DEFAULT.
 
@@ -128,6 +147,10 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import unicode_literals
 
+try:
+    from collections.abc import MutableMapping
+except ImportError:
+    from collections import MutableMapping
 import functools
 import io
 import itertools
@@ -859,6 +882,7 @@ class RawConfigParser(MutableMapping):
         except KeyError:
             if section != self.default_section:
                 raise NoSectionError(section)
+        orig_keys = list(d.keys())
         # Update with the entry specific variables
         if vars:
             for key, value in vars.items():
@@ -867,7 +891,7 @@ class RawConfigParser(MutableMapping):
             section, option, d[option], d)
         if raw:
             value_getter = lambda option: d[option]
-        return [(option, value_getter(option)) for option in d.keys()]
+        return [(option, value_getter(option)) for option in orig_keys]
 
     def popitem(self):
         """Remove a section from the parser and return it as
@@ -974,7 +998,8 @@ class RawConfigParser(MutableMapping):
     def __setitem__(self, key, value):
         # To conform with the mapping protocol, overwrites existing values in
         # the section.
-
+        if key in self and self[key] is value:
+            return
         # XXX this is not atomic if read_dict fails at any point. Then again,
         # no update method in configparser is atomic in this implementation.
         if key == self.default_section:
