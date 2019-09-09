@@ -16,7 +16,7 @@
 .. image:: https://readthedocs.org/projects/configparser/badge/?version=latest
    :target: https://configparser.readthedocs.io/en/latest/?badge=latest
 
-.. image:: https://tidelift.com/badges/github/jaraco/configparser
+.. image:: https://tidelift.com/badges/package/pypi/configparser
    :target: https://tidelift.com/subscription/pkg/pypi-configparser?utm_source=pypi-configparser&utm_medium=readme
 
 
