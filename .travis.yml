@@ -1,5 +1,4 @@
 dist: xenial
-sudo: false
 language: python
 
 python:
@@ -14,11 +13,6 @@ jobs:
     if: tag IS present
     python: *latest_py3
     before_script: skip
-    env:
-    - TWINE_USERNAME=__token__
-    # TWINE_PASSWORD
-    - secure: pQC21x8b8mLf5y88h4D+MTMtLFXGRFDvENFo01wmDZq//uIPrZiOLvJKT7Sb41KY5IlQI0ppYitN1cipBxU0SGPM6oZ6VaGjPKRn2QKx9xxBLWA99z7LMZqhKsYw3A+sSwQYTdUaMSTsIiEJcLKgENV/jVdJPMCEkB6tXj0Oh2D2O1JEL6jVvMBAwtNb9aUlr8ctxr0YQhvifVawr4u/VvB2QDL65TihvDGb9LLTXeEg34wUJQc33UTWUTA/zJauC0m3GVCQCDsbQHd6O39Q+8Hy4bAfKEETkq/Nmr7HzCGO7M5ehB6s52kfILRcNQb/9FItdPDTKlD4v/Kz3VH2N2tcEMwfjZwa+6w+bkPqNmQmYkRNfp4dBoYacLEcldhltE69k1Dd5ooh6C1eO+Nek12KXfjBTf+ahyjVIlsectrEpAcLkNGid0N9eynvJMZj4MDfEMUU/4/29BU9nBWpTBbccS0/lHl0e4cPM0lb9QMKaL4LIUSzhthbTJlV10R9V5WlPEWcOtanSMyKoE2QClf4Jqbq/BwiwUE+v++WI4sbCi80JsW3+CaIKkUewkqyrlBGztitRNMWgABdsmf/53kAVUSQvUmsX3ux6FKXvb/9y7RhAQ7FX1x8fHCC6/UfNT7D9pJTIvJrS/qk+Rw0iDbmHZusiPfF8Ng8tEAa7dY=
-    - TOX_TESTENV_PASSENV="TWINE_USERNAME TWINE_PASSWORD"
     script: tox -e release
 
 cache: pip
