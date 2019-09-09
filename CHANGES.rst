@@ -1,3 +1,8 @@
+v4.0.1
+======
+
+* Cleaned up broken badges and release notes publishing.
+
 v4.0.0
 ======
 
