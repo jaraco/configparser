@@ -1,3 +1,10 @@
+4.0.0
+=====
+
+* Switched to
+  `semver <https://semver.org/spec/v2.0.0.html>`_
+  for versioning this backport.
+
 3.8.1
 =====
 

@@ -125,23 +125,16 @@ source (e.g. a file) or write back.
 Versioning
 ----------
 
-This backport is intended to keep 100% compatibility with the vanilla release in
-Python 3.2+. To help maintaining a version you want and expect, a versioning
-scheme is used where:
+This project uses `semver <https://semver.org/spec/v2.0.0.html>`_ to
+communicate the impact of various releases while periodically syncing
+with the upstream implementation in CPython.
+`The changelog <https://github.com/jaraco/configparser/blob/master/CHANGES.rst>`_
+serves as a reference indicating which versions incorporate
+which upstream functionality.
 
-* the first two numbers indicate the version of Python 3 from which the
-  backport is done
-
-* a backport release number is provided as the final number (zero-indexed)
-
-For example, ``3.5.2`` is the **third** backport release of the
-``configparser`` library as seen in Python 3.5.  Note that ``3.5.2`` does
-**NOT** necessarily mean this backport version is based on the standard library
-of Python 3.5.2.
-
-One exception from the 100% compatibility principle is that bugs fixed before
-releasing another minor Python 3 bugfix version **will be included** in the
-backport releases done in the mean time.
+Prior to the ``4.0.0`` release, `another scheme
+<https://github.com/jaraco/configparser/blob/3.8.1/README.rst#versioning>`_
+was used to associate the CPython and backports releases.
 
 Maintenance
 -----------
