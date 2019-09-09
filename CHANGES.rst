@@ -5,6 +5,8 @@
   `semver <https://semver.org/spec/v2.0.0.html>`_
   for versioning this backport.
 
+* Project now uses ``setuptools_scm`` for tagging releases.
+
 3.8.1
 =====
 
