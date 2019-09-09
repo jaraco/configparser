@@ -40,7 +40,7 @@ v4.0.0
 (also released as 3.8.0)
 
 * Repackaged using setuptools_scm for file discovery and other features
-  from `skeleton <https://pypi.org/project/skeleton`_. Fixes #33.
+  from `skeleton <https://pypi.org/project/skeleton>`_. Fixes #33.
 
 * Package now unconditionally installs the  ``configparser`` module.
   Doing so allowed for the project to release a universal wheel for
