@@ -12,7 +12,6 @@ except ImportError:
 
 
 class TestChainMap(unittest.TestCase):
-
     def test_basics(self):
         c = _ChainMap()
         c['a'] = 1
@@ -48,12 +47,15 @@ class TestChainMap(unittest.TestCase):
         for k, v in dict(a=1, b=2, c=30, z=100).items():
             self.assertEqual(d.get(k, 100), v)
         # check repr
-        self.assertIn(repr(d), [
-            type(d).__name__ + "({'c': 30}, {'a': 1, 'b': 2})",
-            type(d).__name__ + "({'c': 30}, {'b': 2, 'a': 1})"
-        ])
+        self.assertIn(
+            repr(d),
+            [
+                type(d).__name__ + "({'c': 30}, {'a': 1, 'b': 2})",
+                type(d).__name__ + "({'c': 30}, {'b': 2, 'a': 1})",
+            ],
+        )
 
-# check shallow copies
+        # check shallow copies
         for e in d.copy(), copy.copy(d):
             self.assertEqual(d, e)
             self.assertEqual(d.maps, e.maps)
@@ -63,10 +65,7 @@ class TestChainMap(unittest.TestCase):
                 self.assertIs(m1, m2)
 
         # check deep copies
-        for e in [pickle.loads(pickle.dumps(d)),
-                  copy.deepcopy(d),
-                  eval(repr(d))
-                  ]:
+        for e in [pickle.loads(pickle.dumps(d)), copy.deepcopy(d), eval(repr(d))]:
             self.assertEqual(d, e)
             self.assertEqual(d.maps, e.maps)
             self.assertIsNot(d, e)
@@ -93,6 +92,7 @@ class TestChainMap(unittest.TestCase):
         class DefaultChainMap(_ChainMap):
             def __missing__(self, key):
                 return 999
+
         d = DefaultChainMap(dict(a=1, b=2), dict(b=20, c=30))
         for k, v in dict(a=1, b=2, c=30, d=999).items():
             # check __getitem__ w/missing

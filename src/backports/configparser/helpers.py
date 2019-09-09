@@ -31,6 +31,7 @@ except ImportError:
 
 from io import open
 import sys
+
 try:
     from thread import get_ident
 except ImportError:
@@ -104,7 +105,7 @@ class _ChainMap(MutableMapping):
         If no mappings are provided, a single empty dictionary is used.
 
         '''
-        self.maps = list(maps) or [{}]          # always at least one map
+        self.maps = list(maps) or [{}]  # always at least one map
 
     def __missing__(self, key):
         raise KeyError(key)
@@ -135,7 +136,8 @@ class _ChainMap(MutableMapping):
     @recursive_repr()
     def __repr__(self):
         return '{0.__class__.__name__}({1})'.format(
-            self, ', '.join(map(repr, self.maps)))
+            self, ', '.join(map(repr, self.maps))
+        )
 
     @classmethod
     def fromkeys(cls, iterable, *args):
@@ -151,12 +153,12 @@ class _ChainMap(MutableMapping):
 
     __copy__ = copy
 
-    def new_child(self):                        # like Django's Context.push()
+    def new_child(self):  # like Django's Context.push()
         'New ChainMap with a new dict followed by all previous maps.'
         return self.__class__({}, *self.maps)
 
     @property
-    def parents(self):                          # like Django's Context.pop()
+    def parents(self):  # like Django's Context.pop()
         'New ChainMap from maps[1:].'
         return self.__class__(*self.maps[1:])
 
@@ -167,8 +169,7 @@ class _ChainMap(MutableMapping):
         try:
             del self.maps[0][key]
         except KeyError:
-            raise KeyError(
-                'Key not found in the first mapping: {!r}'.format(key))
+            raise KeyError('Key not found in the first mapping: {!r}'.format(key))
 
     def popitem(self):
         """
@@ -189,8 +190,7 @@ class _ChainMap(MutableMapping):
         try:
             return self.maps[0].pop(key, *args)
         except KeyError:
-            raise KeyError(
-                'Key not found in the first mapping: {!r}'.format(key))
+            raise KeyError('Key not found in the first mapping: {!r}'.format(key))
 
     def clear(self):
         'Clear maps[0], leaving maps[1:] intact.'
@@ -204,13 +204,10 @@ except ImportError:
 
 
 _ABC = getattr(
-    abc, 'ABC',
+    abc,
+    'ABC',
     # Python 3.3 compatibility
-    abc.ABCMeta(
-        native_str('__ABC'),
-        (object,),
-        dict(__metaclass__=abc.ABCMeta),
-    ),
+    abc.ABCMeta(native_str('__ABC'), (object,), dict(__metaclass__=abc.ABCMeta)),
 )
 
 
@@ -228,7 +225,8 @@ class _PathLike(_ABC):
         return bool(
             hasattr(subclass, '__fspath__')
             # workaround for Python 3.5
-            or pathlib and issubclass(subclass, pathlib.Path)
+            or pathlib
+            and issubclass(subclass, pathlib.Path)
         )
 
 
@@ -260,14 +258,17 @@ def _fspath(path):
         if hasattr(path_type, '__fspath__'):
             raise
         else:
-            raise TypeError("expected str, bytes or os.PathLike object, "
-                            "not " + path_type.__name__)
+            raise TypeError(
+                "expected str, bytes or os.PathLike object, "
+                "not " + path_type.__name__
+            )
     if isinstance(path_repr, (str, bytes)):
         return path_repr
     else:
-        raise TypeError("expected {}.__fspath__() to return str or bytes, "
-                        "not {}".format(path_type.__name__,
-                                        type(path_repr).__name__))
+        raise TypeError(
+            "expected {}.__fspath__() to return str or bytes, "
+            "not {}".format(path_type.__name__, type(path_repr).__name__)
+        )
 
 
 fspath = getattr(os, 'fspath', _fspath)
