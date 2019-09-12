@@ -1,3 +1,8 @@
+v4.0.2
+======
+
+* Re-release after pulling 4.0.0 and 4.0.1 due to #45.
+
 v4.0.1
 ======
 
