@@ -1,13 +1,19 @@
 .. image:: https://img.shields.io/pypi/v/configparser.svg
-   :target: https://pypi.org/project/configparser
+   :target: `PyPI link`_
 
 .. image:: https://img.shields.io/pypi/pyversions/configparser.svg
+   :target: `PyPI link`_
+
+.. _PyPI link: https://pypi.org/project/configparser
+
+.. image:: https://dev.azure.com/jaraco/configparser/_apis/build/status/jaraco.configparser?branchName=master
+   :target: https://dev.azure.com/jaraco/configparser/_build/latest?definitionId=1&branchName=master
 
 .. image:: https://img.shields.io/travis/jaraco/configparser/master.svg
    :target: https://travis-ci.org/jaraco/configparser
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-   :target: https://github.com/ambv/black
+   :target: https://github.com/psf/black
    :alt: Code style: Black
 
 .. .. image:: https://img.shields.io/appveyor/ci/jaraco/configparser/master.svg
