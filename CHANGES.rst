@@ -1,3 +1,12 @@
+v5.0.0
+======
+
+* Require Python 3.6 or later. For Python 2.6-3.5, use
+  ``configparser < 5`` (selection should be automatic
+  when installed using pip 9 from PyPI). The ``4.x`` line
+  remains supported for bug fixes but will no longer
+  be updated for future releases.
+
 v4.0.2
 ======
 
