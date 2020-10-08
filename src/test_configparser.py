@@ -2085,8 +2085,8 @@ class InlineCommentStrippingTestCase(unittest.TestCase):
 
 
 class ExceptionContextTestCase(unittest.TestCase):
-    """ Test that implementation details doesn't leak
-    through raising exceptions. """
+    """Test that implementation details doesn't leak
+    through raising exceptions."""
 
     def test_get_basic_interpolation(self):
         parser = configparser.ConfigParser()

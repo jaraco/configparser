@@ -1236,8 +1236,7 @@ class RawConfigParser(MutableMapping):
         return _ChainMap(vardict, sectiondict, self._defaults)
 
     def _convert_to_boolean(self, value):
-        """Return a boolean value translating from other types if necessary.
-        """
+        """Return a boolean value translating from other types if necessary."""
         if value.lower() not in self.BOOLEAN_STATES:
             raise ValueError('Not a boolean: %s' % value)
         return self.BOOLEAN_STATES[value.lower()]
