@@ -12,20 +12,23 @@ import os
 import textwrap
 import warnings
 
+from typing import Type, Iterable
+from collections.abc import Mapping
+
 try:
     import unittest2 as unittest
 except ImportError:
-    import unittest
+    import unittest  # type: ignore
 
 try:
     from test import support
 except ImportError:
-    from test import test_support as support
+    from test import test_support as support  # type: ignore
 
 try:
     import pathlib
 except ImportError:
-    import pathlib2 as pathlib
+    import pathlib2 as pathlib  # type: ignore
 
 from backports import configparser
 from backports.configparser.helpers import UserDict, PY2, open, str
@@ -60,11 +63,11 @@ class SortedDict(UserDict):
 
 class CfgParserTestCaseClass(object):
     allow_no_value = False
-    delimiters = ('=', ':')
-    comment_prefixes = (';', '#')
-    inline_comment_prefixes = (';', '#')
+    delimiters = ('=', ':')  # type: Iterable[str]
+    comment_prefixes = (';', '#')  # type: Iterable[str]
+    inline_comment_prefixes = (';', '#')  # type: Iterable[str]
     empty_lines_in_values = True
-    dict_type = configparser._default_dict
+    dict_type = configparser._default_dict  # type: Type[Mapping]
     strict = False
     default_section = configparser.DEFAULTSECT
     interpolation = configparser._UNSET

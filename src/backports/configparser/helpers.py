@@ -17,17 +17,17 @@ except ImportError:
 try:
     from collections import UserDict
 except ImportError:
-    from UserDict import UserDict
+    from UserDict import UserDict  # type: ignore
 
 try:
     from collections import OrderedDict
 except ImportError:
-    from ordereddict import OrderedDict
+    from ordereddict import OrderedDict  # type: ignore
 
 try:
     import pathlib
 except ImportError:
-    pathlib = None
+    pathlib = None  # type: ignore
 
 from io import open
 import sys
@@ -48,7 +48,7 @@ PY2 = sys.version_info[0] == 2
 PY3 = sys.version_info[0] == 3
 
 native_str = str
-str = type('str')
+str = str if PY3 else eval('unicode')
 
 
 def from_none(exc):
@@ -200,7 +200,7 @@ class _ChainMap(MutableMapping):
 try:
     from collections import ChainMap
 except ImportError:
-    ChainMap = _ChainMap
+    ChainMap = _ChainMap  # type: ignore
 
 
 _ABC = getattr(
@@ -211,7 +211,7 @@ _ABC = getattr(
 )
 
 
-class _PathLike(_ABC):
+class _PathLike(_ABC):  # type: ignore
 
     """Abstract base class for implementing the file system path protocol."""
 
