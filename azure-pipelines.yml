@@ -59,7 +59,8 @@ stages:
       condition: and(succeeded(), ne(variables['python.version'], '3.9'))
 
     - script: |
-        chcp 65001  # workaround for pypa/pip#8931
+        # workaround for pypa/pip#8931
+        set PYTHONIOENCODING=utf-8
         python -m pip install tox
       displayName: 'Install tox'
 
