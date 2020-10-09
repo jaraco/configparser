@@ -14,6 +14,7 @@ import warnings
 
 from typing import Type, Iterable
 from collections.abc import Mapping
+from collections import UserDict
 
 try:
     import unittest2 as unittest
@@ -31,7 +32,6 @@ except ImportError:
     import pathlib2 as pathlib  # type: ignore
 
 from backports import configparser
-from backports.configparser.helpers import UserDict, PY2, open, str
 
 
 def nice_literals(str):
@@ -2361,8 +2361,7 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
 class MiscTestCase(unittest.TestCase):
     @unittest.skipIf(not hasattr(support, 'check__all__'), "check__all__ not available")
     def test__all__(self):
-        # blacklist = {"Error", "PY2"}
-        blacklist = set(["Error", "PY2"])
+        blacklist = {"Error", "PY2"}
         support.check__all__(self, configparser, blacklist=blacklist)
 
 
@@ -2411,52 +2410,6 @@ class UnicodeBackportTestCase(unittest.TestCase):
         cp['section'] = {'nothing': 'nada'}
         self.assertIsAlright(cp, 'nada')
 
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
-    def test_bytes_bytes_old_style(self):
-        cp = configparser.ConfigParser()
-        cp.add_section(b"section")
-        self.assertIsInstance(cp.sections()[0], str)
-        self.assertIsInstance([sect for sect in cp][0], str)
-        cp.set(b"section", b"nothing", b"nada")
-        self.assertIsAlright(cp, b"nada")
-
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
-    def test_bytes_bytes_new_style(self):
-        cp = configparser.ConfigParser()
-        cp[b"section"] = {}
-        self.assertIsInstance(cp.sections()[0], str)
-        self.assertIsInstance([sect for sect in cp][0], str)
-        cp[b"section"][b"nothing"] = b"nada"
-        self.assertIsAlright(cp, b"nada")
-
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
-    def test_bytes_bytes_new_style_one_step(self):
-        cp = configparser.ConfigParser()
-        cp[b'section'] = {b'nothing': b'nada'}
-        self.assertIsAlright(cp, b'nada')
-
-    @unittest.skipIf(not PY2, "Bytes aren't supported in configparser on Py 3")
-    def test_bytes_exceptions(self):
-        cp = configparser.ConfigParser()
-        cp[b'section'] = {b'nothing': b'nada'}
-        self.assertIsAlright(cp, b'nada')
-        with self.assertRaises(UnicodeDecodeError):
-            cp.add_section(b'\xef')
-        with self.assertRaises(UnicodeDecodeError):
-            cp[b'\xef'] = {}
-        with self.assertRaises(UnicodeDecodeError):
-            cp.set('section', b'\xef', b'value')
-        with self.assertRaises(UnicodeDecodeError):
-            cp['section'][b'\xef'] = b'value'
-        with self.assertRaises(UnicodeDecodeError):
-            cp['new'] = {b'\xef': b'value'}
-        with self.assertRaises(UnicodeDecodeError):
-            cp.set('section', b'\xef', b'\xef')
-        with self.assertRaises(UnicodeDecodeError):
-            cp['section'][b'\xef'] = b'\xef'
-        with self.assertRaises(UnicodeDecodeError):
-            cp['new'] = {b'key': b'\xef'}
-
     def test_unicode_extended_characters(self):
         cp = configparser.ConfigParser()
         cp.add_section('section')
@@ -2480,12 +2433,6 @@ class UnicodeBackportTestCase(unittest.TestCase):
         self.assertIsInstance([sect for sect in cp][0], str)
         self.assertIsInstance([opt for opt in cp['section']][0], str)
         self.assertEqual(cp['section']['nothing'], optvalue)
-        if PY2:
-            self.assertIn('nothing', cp[b'section'])
-            self.assertIsInstance(cp.options(b'section')[0], str)
-            self.assertEqual(cp.get(b'section', b'nothing'), optvalue)
-            self.assertIsInstance([opt for opt in cp[b'section']][0], str)
-            self.assertEqual(cp[b'section'][b'nothing'], optvalue)
 
 
 if __name__ == '__main__':
