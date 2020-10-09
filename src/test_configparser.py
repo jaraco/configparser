@@ -1,35 +1,16 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # flake8: noqa
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import io
 import os
 import textwrap
 import warnings
+import unittest
+import pathlib
 
 from typing import Type, Iterable
 from collections.abc import Mapping
 from collections import UserDict
-
-try:
-    import unittest2 as unittest
-except ImportError:
-    import unittest  # type: ignore
-
-try:
-    from test import support
-except ImportError:
-    from test import test_support as support  # type: ignore
-
-try:
-    import pathlib
-except ImportError:
-    import pathlib2 as pathlib  # type: ignore
+from test import support
 
 from backports import configparser
 
