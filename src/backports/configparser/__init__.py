@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
 # flake8: noqa
 
 """Configuration file parser.
@@ -142,15 +140,6 @@ ConfigParser -- responsible for parsing a list of
         between keys and values are surrounded by spaces.
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
-try:
-    from collections.abc import MutableMapping
-except ImportError:
-    from collections import MutableMapping
 import functools
 import io
 import itertools
@@ -158,12 +147,9 @@ import os
 import re
 import sys
 import warnings
-
-from backports.configparser.helpers import OrderedDict as _default_dict
-from backports.configparser.helpers import ChainMap as _ChainMap
-from backports.configparser.helpers import from_none, open, str, PY2
-from backports.configparser.helpers import PathLike, fspath
-from backports.configparser.helpers import MutableMapping
+from collections import OrderedDict as _default_dict
+from collections import ChainMap as _ChainMap
+from collections.abc import MutableMapping
 
 __all__ = [
     "NoSectionError",
@@ -470,9 +456,9 @@ class BasicInterpolation(Interpolation):
                 try:
                     v = map[var]
                 except KeyError:
-                    raise from_none(
-                        InterpolationMissingOptionError(option, section, rawval, var)
-                    )
+                    raise InterpolationMissingOptionError(
+                        option, section, rawval, var
+                    ) from None
                 if "%" in v:
                     self._interpolate_some(
                         parser, option, accum, v, section, map, depth + 1
@@ -550,11 +536,9 @@ class ExtendedInterpolation(Interpolation):
                             option, section, "More than one ':' found: %r" % (rest,)
                         )
                 except (KeyError, NoSectionError, NoOptionError):
-                    raise from_none(
-                        InterpolationMissingOptionError(
-                            option, section, rawval, ":".join(path)
-                        )
-                    )
+                    raise InterpolationMissingOptionError(
+                        option, section, rawval, ":".join(path)
+                    ) from None
                 if "$" in v:
                     self._interpolate_some(
                         parser,
@@ -592,11 +576,9 @@ class LegacyInterpolation(Interpolation):
                 try:
                     value = value % vars
                 except KeyError as e:
-                    raise from_none(
-                        InterpolationMissingOptionError(
-                            option, section, rawval, e.args[0]
-                        )
-                    )
+                    raise InterpolationMissingOptionError(
+                        option, section, rawval, e.args[0]
+                    ) from None
             else:
                 break
         if value and "%(" in value:
@@ -743,7 +725,7 @@ class RawConfigParser(MutableMapping):
         try:
             opts = self._sections[section].copy()
         except KeyError:
-            raise from_none(NoSectionError(section))
+            raise NoSectionError(section) from None
         opts.update(self._defaults)
         return list(opts.keys())
 
@@ -759,12 +741,12 @@ class RawConfigParser(MutableMapping):
 
         Return list of successfully read files.
         """
-        if isinstance(filenames, (str, bytes, PathLike)):
+        if isinstance(filenames, (str, bytes, os.PathLike)):
             filenames = [filenames]
         read_ok = []
         for filename in filenames:
-            if isinstance(filename, PathLike):
-                filename = fspath(filename)
+            if isinstance(filename, os.PathLike):
+                filename = os.fspath(filename)
             try:
                 with open(filename, encoding=encoding) as fp:
                     self._read(fp, filename)
@@ -982,7 +964,7 @@ class RawConfigParser(MutableMapping):
             try:
                 sectdict = self._sections[section]
             except KeyError:
-                raise from_none(NoSectionError(section))
+                raise NoSectionError(section) from None
         sectdict[self.optionxform(option)] = value
 
     def write(self, fp, space_around_delimiters=True):
@@ -1020,7 +1002,7 @@ class RawConfigParser(MutableMapping):
             try:
                 sectdict = self._sections[section]
             except KeyError:
-                raise from_none(NoSectionError(section))
+                raise NoSectionError(section) from None
         option = self.optionxform(option)
         existed = option in sectdict
         if existed:
@@ -1258,24 +1240,6 @@ class RawConfigParser(MutableMapping):
         section = kwargs.get('section', "")
         option = kwargs.get('option', "")
         value = kwargs.get('value', "")
-
-        if PY2 and bytes in (type(section), type(option), type(value)):
-            # we allow for a little unholy magic for Python 2 so that
-            # people not using unicode_literals can still use the library
-            # conveniently
-            warnings.warn(
-                "You passed a bytestring. Implicitly decoding as UTF-8 string."
-                " This will not work on Python 3. Please switch to using"
-                " Unicode strings across the board.",
-                DeprecationWarning,
-                stacklevel=2,
-            )
-            if isinstance(section, bytes):
-                section = section.decode('utf8')
-            if isinstance(option, bytes):
-                option = option.decode('utf8')
-            if isinstance(value, bytes):
-                value = value.decode('utf8')
 
         if not isinstance(section, str):
             raise TypeError("section names must be strings")
