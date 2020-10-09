@@ -1,5 +1,3 @@
-# flake8: noqa
-
 """Configuration file parser.
 
 A configuration file consists of sections, lead by a "[section]" header,
@@ -918,11 +916,15 @@ class RawConfigParser(MutableMapping):
         if vars:
             for key, value in vars.items():
                 d[self.optionxform(key)] = value
-        value_getter = lambda option: self._interpolation.before_get(
-            self, section, option, d[option], d
-        )
-        if raw:
-            value_getter = lambda option: d[option]
+
+        def value_getter_interp(option):
+            return self._interpolation.before_get(self, section, option, d[option], d)
+
+        def value_getter_raw(option):
+            return d[option]
+
+        value_getter = value_getter_raw if raw else value_getter_interp
+
         return [(option, value_getter(option)) for option in orig_keys]
 
     def popitem(self):

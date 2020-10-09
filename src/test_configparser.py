@@ -1,5 +1,3 @@
-# flake8: noqa
-
 import io
 import os
 import textwrap
@@ -747,6 +745,7 @@ boolean {0[0]} NO
         )
         # Check that we don't get an exception when setting values in
         # an existing section using strings:
+
         class mystr(str):
             pass
 
