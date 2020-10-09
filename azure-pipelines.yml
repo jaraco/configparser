@@ -29,12 +29,13 @@ stages:
           python.version: '3.6'
         Bionic Python 3.8:
           python.version: '3.8'
-        Windows Python 3.8:
-          python.version: '3.8'
-          pool_vm_image: vs2017-win2016
-        Windows Python Prerelease:
-          python.version: '3.9'
-          pool_vm_image: vs2017-win2016
+        # Tests on Windows disabled due to pypa/pip#8931
+        #Windows Python 3.8:
+        #  python.version: '3.8'
+        #  pool_vm_image: vs2017-win2016
+        #Windows Python Prerelease:
+        #  python.version: '3.9'
+        #  pool_vm_image: vs2017-win2016
         MacOS:
           python.version: '3.8'
           pool_vm_image: macos-10.15
