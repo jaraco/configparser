@@ -59,6 +59,7 @@ stages:
       condition: and(succeeded(), ne(variables['python.version'], '3.9'))
 
     - script: |
+        set PYTHONPATH=.
         python -m pip install tox
       displayName: 'Install tox'
 

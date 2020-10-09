@@ -1,4 +1,1 @@
-import sys
-import imp
-imp.reload(sys)
-sys.setdefaultencoding('utf-8')
+__import__('_locale')._getdefaultlocale = lambda *args: ['en_US', 'utf8']
