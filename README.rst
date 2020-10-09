@@ -168,40 +168,32 @@ This section is technical and should bother you only if you are wondering how
 this backport is produced. If the implementation details of this backport are
 not important for you, feel free to ignore the following content.
 
-``configparser`` is converted using `python-future
-<http://python-future.org>`_. The project takes the following
-branching approach:
+The project takes the following branching approach:
 
-* the ``3.x`` branch holds unchanged files synchronized from the upstream
+* The ``3.x`` branch holds unchanged files synchronized from the upstream
   CPython repository. The synchronization is currently done by manually copying
-  the required files and stating from which CPython changeset they come from.
+  the required files and stating from which CPython changeset they come.
 
-* the ``master`` branch holds a version of the ``3.x`` code with some tweaks
-  that make it independent from libraries and constructions unavailable on 2.x.
-  Code on this branch still *must* work on the corresponding Python 3.x but
-  will also work on Python 2.6 and 2.7 (including PyPy).  You can check this
-  running the supplied unit tests with ``tox``.
+* The ``master`` branch holds a version of the ``3.x`` code with some tweaks
+  that make it compatible with older Pythons. Code on this branch must work
+  on all supported Python versions. Test with ``tox`` or in CI.
 
 The process works like this:
 
 1. In the ``3.x`` branch, run ``pip-run -- sync-upstream.py``, which
    downloads the latest stable release of Python and copies the relevant
-   files from there into their new locations here and then commits those
+   files from there into their new locations and then commits those
    changes with a nice reference to the relevant upstream commit hash.
 
-2. I check for new names in ``__all__`` and update imports in
-   ``configparser.py`` accordingly. I run the tests on Python 3. Commit.
+2. Check for new names in ``__all__`` and update imports in
+   ``configparser.py`` accordingly. Optionally, run the tests on a late
+   Python 3. Commit.
 
-3. I merge the new commit to ``master``. I run ``tox``. Commit.
+3. Merge the new commit to ``master``. Run tests. Commit.
 
-4. If there are necessary changes, I do them now (on ``master``). Note that
-   the changes should be written in the syntax subset supported by Python
-   2.6.
+4. Make any compatibility changes on ``master``. Run tests. Commit.
 
-5. I run ``tox``. If it works, I update the docs and release the new version.
-   Otherwise, I go back to point 3. I might use ``pasteurize`` to suggest me
-   required changes but usually I do them manually to keep resulting code in
-   a nicer form.
+5. Update the docs and release the new version.
 
 
 Footnotes
