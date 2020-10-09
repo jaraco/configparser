@@ -58,7 +58,9 @@ stages:
         architecture: 'x64'
       condition: and(succeeded(), ne(variables['python.version'], '3.9'))
 
-    - script: python -m pip install tox
+    - script: |
+        chcp 65001  # workaround for pypa/pip#8931
+        python -m pip install tox
       displayName: 'Install tox'
 
     - script: |
