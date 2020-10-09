@@ -1,6 +1,7 @@
 v5.0.1
 ======
 
+* Synced with Python 3.9.0.
 * Refreshed package metadata.
 
 v5.0.0
