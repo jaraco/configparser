@@ -6,18 +6,13 @@
 
 .. _PyPI link: https://pypi.org/project/configparser
 
-.. image:: https://dev.azure.com/jaraco/configparser/_apis/build/status/jaraco.configparser?branchName=master
-   :target: https://dev.azure.com/jaraco/configparser/_build/latest?definitionId=1&branchName=master
-
-.. image:: https://img.shields.io/travis/jaraco/configparser/master.svg
-   :target: https://travis-ci.org/jaraco/configparser
+.. image:: https://github.com/jaraco/configparser/workflows/Automated%20Tests/badge.svg
+   :target: https://github.com/jaraco/configparser/actions?query=workflow%3A%22Automated+Tests%22
+   :alt: Automated Tests
 
 .. image:: https://img.shields.io/badge/code%20style-black-000000.svg
    :target: https://github.com/psf/black
    :alt: Code style: Black
-
-.. .. image:: https://img.shields.io/appveyor/ci/jaraco/configparser/master.svg
-..    :target: https://ci.appveyor.com/project/jaraco/configparser/branch/master
 
 .. image:: https://readthedocs.org/projects/configparser/badge/?version=latest
    :target: https://configparser.readthedocs.io/en/latest/?badge=latest
