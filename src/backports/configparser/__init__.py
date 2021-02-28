@@ -424,9 +424,9 @@ class BasicInterpolation(Interpolation):
             )
         return value
 
-    def _interpolate_some(
+    def _interpolate_some(  # noqa: C901
         self, parser, option, accum, rest, section, map, depth
-    ):  # noqa: C901
+    ):
         rawval = parser.get(section, option, raw=True, fallback=rest)
         if depth > MAX_INTERPOLATION_DEPTH:
             raise InterpolationDepthError(option, section, rawval)
@@ -494,9 +494,9 @@ class ExtendedInterpolation(Interpolation):
             )
         return value
 
-    def _interpolate_some(
+    def _interpolate_some(  # noqa: C901
         self, parser, option, accum, rest, section, map, depth
-    ):  # noqa: C901
+    ):
         rawval = parser.get(section, option, raw=True, fallback=rest)
         if depth > MAX_INTERPOLATION_DEPTH:
             raise InterpolationDepthError(option, section, rawval)
