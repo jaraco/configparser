@@ -424,7 +424,7 @@ class BasicInterpolation(Interpolation):
             )
         return value
 
-    def _interpolate_some(self, parser, option, accum, rest, section, map, depth):
+    def _interpolate_some(self, parser, option, accum, rest, section, map, depth):  # noqa: C901
         rawval = parser.get(section, option, raw=True, fallback=rest)
         if depth > MAX_INTERPOLATION_DEPTH:
             raise InterpolationDepthError(option, section, rawval)
@@ -492,7 +492,7 @@ class ExtendedInterpolation(Interpolation):
             )
         return value
 
-    def _interpolate_some(self, parser, option, accum, rest, section, map, depth):
+    def _interpolate_some(self, parser, option, accum, rest, section, map, depth):  # noqa: C901
         rawval = parser.get(section, option, raw=True, fallback=rest)
         if depth > MAX_INTERPOLATION_DEPTH:
             raise InterpolationDepthError(option, section, rawval)
@@ -1054,7 +1054,7 @@ class RawConfigParser(MutableMapping):
         # XXX does it break when underlying container state changed?
         return itertools.chain((self.default_section,), self._sections.keys())
 
-    def _read(self, fp, fpname):
+    def _read(self, fp, fpname):  # noqa: C901
         """Parse a sectioned configuration file.
 
         Each section in a configuration file contains a header, indicated by
