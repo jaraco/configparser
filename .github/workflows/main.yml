@@ -7,7 +7,11 @@ jobs:
     strategy:
       matrix:
         python: [3.6, 3.8, 3.9]
-        platform: [ubuntu-latest, macos-latest, windows-latest]
+        platform:
+        - ubuntu-latest
+        - macos-latest
+        # disabled due to #58
+        # - windows-latest
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v2
