@@ -138,17 +138,16 @@ ConfigParser -- responsible for parsing a list of
         between keys and values are surrounded by spaces.
 """
 
+from collections.abc import MutableMapping
+from collections import ChainMap as _ChainMap
 import functools
+from .compat import io
 import itertools
 import os
 import re
 import sys
 import warnings
-from collections import OrderedDict as _default_dict
-from collections import ChainMap as _ChainMap
-from collections.abc import MutableMapping
 
-from .compat import io
 
 __all__ = [
     "NoSectionError",
@@ -174,6 +173,7 @@ __all__ = [
     "MAX_INTERPOLATION_DEPTH",
 ]
 
+from collections import OrderedDict as _default_dict
 DEFAULTSECT = "DEFAULT"
 
 MAX_INTERPOLATION_DEPTH = 10
