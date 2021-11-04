@@ -1,9 +1,10 @@
-v5.0.3
+v5.1.0
 ======
 
 * Synced with Python 3.10.0.
 * Packaging refresh.
 * Tests now run on Python 3.10.
+* Modernized code relying on Python 3.6.
 
 v5.0.2
 ======

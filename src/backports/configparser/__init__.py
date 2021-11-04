@@ -279,9 +279,9 @@ class InterpolationMissingOptionError(InterpolationError):
 
     def __init__(self, option, section, rawval, reference):
         msg = (
-            "Bad value substitution: option {0!r} in section {1!r} contains "
-            "an interpolation key {2!r} which is not a valid option name. "
-            "Raw value: {3!r}".format(option, section, reference, rawval)
+            "Bad value substitution: option {!r} in section {!r} contains "
+            "an interpolation key {!r} which is not a valid option name. "
+            "Raw value: {!r}".format(option, section, reference, rawval)
         )
         InterpolationError.__init__(self, option, section, msg)
         self.reference = reference
@@ -301,9 +301,9 @@ class InterpolationDepthError(InterpolationError):
 
     def __init__(self, option, section, rawval):
         msg = (
-            "Recursion limit exceeded in value substitution: option {0!r} "
-            "in section {1!r} contains an interpolation key which "
-            "cannot be substituted in {2} steps. Raw value: {3!r}"
+            "Recursion limit exceeded in value substitution: option {!r} "
+            "in section {!r} contains an interpolation key which "
+            "cannot be substituted in {} steps. Raw value: {!r}"
             "".format(option, section, MAX_INTERPOLATION_DEPTH, rawval)
         )
         InterpolationError.__init__(self, option, section, msg)
@@ -377,7 +377,7 @@ class MissingSectionHeaderError(ParsingError):
 _UNSET = object()
 
 
-class Interpolation(object):
+class Interpolation:
     """Dummy interpolation that passes the value through with no changes."""
 
     def before_get(self, parser, section, option, value, defaults):
@@ -650,18 +650,20 @@ class RawConfigParser(MutableMapping):
     }
 
     def __init__(
-        self, defaults=None, dict_type=_default_dict, allow_no_value=False, **kwargs
+        self,
+        defaults=None,
+        dict_type=_default_dict,
+        allow_no_value=False,
+        *,
+        delimiters=('=', ':'),
+        comment_prefixes=('#', ';'),
+        inline_comment_prefixes=None,
+        strict=True,
+        empty_lines_in_values=True,
+        default_section=DEFAULTSECT,
+        interpolation=_UNSET,
+        converters=_UNSET,
     ):
-
-        # keyword-only arguments
-        delimiters = kwargs.get('delimiters', ('=', ':'))
-        comment_prefixes = kwargs.get('comment_prefixes', ('#', ';'))
-        inline_comment_prefixes = kwargs.get('inline_comment_prefixes', None)
-        strict = kwargs.get('strict', True)
-        empty_lines_in_values = kwargs.get('empty_lines_in_values', True)
-        default_section = kwargs.get('default_section', DEFAULTSECT)
-        interpolation = kwargs.get('interpolation', _UNSET)
-        converters = kwargs.get('converters', _UNSET)
 
         self._dict = dict_type
         self._sections = self._dict()
@@ -749,13 +751,13 @@ class RawConfigParser(MutableMapping):
         encoding = io.text_encoding(encoding)
         read_ok = []
         for filename in filenames:
-            if isinstance(filename, os.PathLike):
-                filename = os.fspath(filename)
             try:
                 with open(filename, encoding=encoding) as fp:
                     self._read(fp, filename)
-            except IOError:
+            except OSError:
                 continue
+            if isinstance(filename, os.PathLike):
+                filename = os.fspath(filename)
             read_ok.append(filename)
         return read_ok
 
@@ -820,7 +822,7 @@ class RawConfigParser(MutableMapping):
         )
         self.read_file(fp, source=filename)
 
-    def get(self, section, option, **kwargs):
+    def get(self, section, option, *, raw=False, vars=None, fallback=_UNSET):
         """Get an option value for a given section.
 
         If `vars' is provided, it must be a dictionary. The option is looked up
@@ -835,11 +837,6 @@ class RawConfigParser(MutableMapping):
 
         The section DEFAULT is special.
         """
-        # keyword-only arguments
-        raw = kwargs.get('raw', False)
-        vars = kwargs.get('vars', None)
-        fallback = kwargs.get('fallback', _UNSET)
-
         try:
             d = self._unify_values(section, vars)
         except NoSectionError:
@@ -864,39 +861,43 @@ class RawConfigParser(MutableMapping):
     def _get(self, section, conv, option, **kwargs):
         return conv(self.get(section, option, **kwargs))
 
-    def _get_conv(self, section, option, conv, **kwargs):
-        # keyword-only arguments
-        kwargs.setdefault('raw', False)
-        kwargs.setdefault('vars', None)
-        fallback = kwargs.pop('fallback', _UNSET)
+    def _get_conv(
+        self, section, option, conv, *, raw=False, vars=None, fallback=_UNSET, **kwargs
+    ):
         try:
-            return self._get(section, conv, option, **kwargs)
+            return self._get(section, conv, option, raw=raw, vars=vars, **kwargs)
         except (NoSectionError, NoOptionError):
             if fallback is _UNSET:
                 raise
             return fallback
 
     # getint, getfloat and getboolean provided directly for backwards compat
-    def getint(self, section, option, **kwargs):
-        # keyword-only arguments
-        kwargs.setdefault('raw', False)
-        kwargs.setdefault('vars', None)
-        kwargs.setdefault('fallback', _UNSET)
-        return self._get_conv(section, option, int, **kwargs)
+    def getint(
+        self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs
+    ):
+        return self._get_conv(
+            section, option, int, raw=raw, vars=vars, fallback=fallback, **kwargs
+        )
 
-    def getfloat(self, section, option, **kwargs):
-        # keyword-only arguments
-        kwargs.setdefault('raw', False)
-        kwargs.setdefault('vars', None)
-        kwargs.setdefault('fallback', _UNSET)
-        return self._get_conv(section, option, float, **kwargs)
+    def getfloat(
+        self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs
+    ):
+        return self._get_conv(
+            section, option, float, raw=raw, vars=vars, fallback=fallback, **kwargs
+        )
 
-    def getboolean(self, section, option, **kwargs):
-        # keyword-only arguments
-        kwargs.setdefault('raw', False)
-        kwargs.setdefault('vars', None)
-        kwargs.setdefault('fallback', _UNSET)
-        return self._get_conv(section, option, self._convert_to_boolean, **kwargs)
+    def getboolean(
+        self, section, option, *, raw=False, vars=None, fallback=_UNSET, **kwargs
+    ):
+        return self._get_conv(
+            section,
+            option,
+            self._convert_to_boolean,
+            raw=raw,
+            vars=vars,
+            fallback=fallback,
+            **kwargs,
+        )
 
     def items(self, section=_UNSET, raw=False, vars=None):
         """Return a list of (name, value) tuples for each option in a section.
@@ -985,7 +986,7 @@ class RawConfigParser(MutableMapping):
         preserved when writing the configuration back.
         """
         if space_around_delimiters:
-            d = " {0} ".format(self._delimiters[0])
+            d = " {} ".format(self._delimiters[0])
         else:
             d = self._delimiters[0]
         if self._defaults:
@@ -995,14 +996,14 @@ class RawConfigParser(MutableMapping):
 
     def _write_section(self, fp, section_name, section_items, delimiter):
         """Write a single section to the specified `fp'."""
-        fp.write("[{0}]\n".format(section_name))
+        fp.write("[{}]\n".format(section_name))
         for key, value in section_items:
             value = self._interpolation.before_write(self, section_name, key, value)
             if value is not None or not self._allow_no_value:
                 value = delimiter + str(value).replace('\n', '\n\t')
             else:
                 value = ""
-            fp.write("{0}{1}\n".format(key, value))
+            fp.write("{}{}\n".format(key, value))
         fp.write("\n")
 
     def remove_option(self, section, option):
@@ -1091,7 +1092,7 @@ class RawConfigParser(MutableMapping):
         for lineno, line in enumerate(fp, start=1):
             comment_start = sys.maxsize
             # strip inline comments
-            inline_prefixes = dict((p, -1) for p in self._inline_comment_prefixes)
+            inline_prefixes = {p: -1 for p in self._inline_comment_prefixes}
             while comment_start == sys.maxsize and inline_prefixes:
                 next_prefixes = {}
                 for prefix, index in inline_prefixes.items():
@@ -1235,7 +1236,7 @@ class RawConfigParser(MutableMapping):
             raise ValueError('Not a boolean: %s' % value)
         return self.BOOLEAN_STATES[value.lower()]
 
-    def _validate_value_types(self, **kwargs):
+    def _validate_value_types(self, *, section="", option="", value=""):
         """Raises a TypeError for non-string values.
 
         The only legal non-string value if we allow valueless
@@ -1248,11 +1249,6 @@ class RawConfigParser(MutableMapping):
         for RawConfigParsers. It is invoked in every case for mapping protocol
         access and in ConfigParser.set().
         """
-        # keyword-only arguments
-        section = kwargs.get('section', "")
-        option = kwargs.get('option', "")
-        value = kwargs.get('value', "")
-
         if not isinstance(section, str):
             raise TypeError("section names must be strings")
         if not isinstance(option, str):
@@ -1260,8 +1256,6 @@ class RawConfigParser(MutableMapping):
         if not self._allow_no_value or value:
             if not isinstance(value, str):
                 raise TypeError("option values must be strings")
-
-        return section, option, value
 
     @property
     def converters(self):
@@ -1276,15 +1270,15 @@ class ConfigParser(RawConfigParser):
     def set(self, section, option, value=None):
         """Set an option.  Extends RawConfigParser.set by validating type and
         interpolation syntax on the value."""
-        _, option, value = self._validate_value_types(option=option, value=value)
-        super(ConfigParser, self).set(section, option, value)
+        self._validate_value_types(option=option, value=value)
+        super().set(section, option, value)
 
     def add_section(self, section):
         """Create a new section in the configuration.  Extends
         RawConfigParser.add_section by validating if the section name is
         a string."""
-        section, _, _ = self._validate_value_types(section=section)
-        super(ConfigParser, self).add_section(section)
+        self._validate_value_types(section=section)
+        super().add_section(section)
 
     def _read_defaults(self, defaults):
         """Reads the defaults passed in the initializer, implicitly converting
@@ -1304,7 +1298,7 @@ class SafeConfigParser(ConfigParser):
     """ConfigParser alias for backwards compatibility purposes."""
 
     def __init__(self, *args, **kwargs):
-        super(SafeConfigParser, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         warnings.warn(
             "The SafeConfigParser class has been renamed to ConfigParser "
             "in Python 3.2. This alias will be removed in future versions."
@@ -1327,7 +1321,7 @@ class SectionProxy(MutableMapping):
             setattr(self, key, getter)
 
     def __repr__(self):
-        return '<Section: {0}>'.format(self._name)
+        return '<Section: {}>'.format(self._name)
 
     def __getitem__(self, key):
         if not self._parser.has_option(self._name, key):
@@ -1335,7 +1329,7 @@ class SectionProxy(MutableMapping):
         return self._parser.get(self._name, key)
 
     def __setitem__(self, key, value):
-        _, key, value = self._parser._validate_value_types(option=key, value=value)
+        self._parser._validate_value_types(option=key, value=value)
         return self._parser.set(self._name, key, value)
 
     def __delitem__(self, key):
@@ -1370,22 +1364,20 @@ class SectionProxy(MutableMapping):
         # The name of the section on a proxy is read-only.
         return self._name
 
-    def get(self, option, fallback=None, **kwargs):
+    def get(self, option, fallback=None, *, raw=False, vars=None, _impl=None, **kwargs):
         """Get an option value.
 
         Unless `fallback` is provided, `None` will be returned if the option
         is not found.
 
         """
-        # keyword-only arguments
-        kwargs.setdefault('raw', False)
-        kwargs.setdefault('vars', None)
-        _impl = kwargs.pop('_impl', None)
         # If `_impl` is provided, it should be a getter method on the parser
         # object that provides the desired type conversion.
         if not _impl:
             _impl = self._parser.get
-        return _impl(self._name, option, fallback=fallback, **kwargs)
+        return _impl(
+            self._name, option, raw=raw, vars=vars, fallback=fallback, **kwargs
+        )
 
 
 class ConverterMapping(MutableMapping):
