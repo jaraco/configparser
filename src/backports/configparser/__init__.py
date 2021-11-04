@@ -173,7 +173,7 @@ __all__ = [
     "MAX_INTERPOLATION_DEPTH",
 ]
 
-from collections import OrderedDict as _default_dict
+_default_dict = dict
 DEFAULTSECT = "DEFAULT"
 
 MAX_INTERPOLATION_DEPTH = 10
