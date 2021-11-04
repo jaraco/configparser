@@ -17,6 +17,9 @@
 .. image:: https://readthedocs.org/projects/configparser/badge/?version=latest
    :target: https://configparser.readthedocs.io/en/latest/?badge=latest
 
+.. image:: https://img.shields.io/badge/skeleton-2021-informational
+   :target: https://blog.jaraco.com/skeleton
+
 .. image:: https://tidelift.com/badges/package/pypi/configparser
    :target: https://tidelift.com/subscription/pkg/pypi-configparser?utm_source=pypi-configparser&utm_medium=readme
 
