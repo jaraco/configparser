@@ -2348,7 +2348,6 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
 
 
 class MiscTestCase(unittest.TestCase):
-    @unittest.skipIf(not hasattr(support, 'check__all__'), "check__all__ not available")
     def test__all__(self):
         check__all__(self, configparser, not_exported={"Error"})
 
