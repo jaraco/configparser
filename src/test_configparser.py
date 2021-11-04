@@ -8,9 +8,8 @@ import pathlib
 from typing import Type, Iterable
 from collections.abc import Mapping
 from collections import UserDict
-from test import support
 
-from compat import check__all__, os_helper
+from compat import support, os_helper
 
 from backports import configparser
 
@@ -2349,7 +2348,7 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
 
 class MiscTestCase(unittest.TestCase):
     def test__all__(self):
-        check__all__(self, configparser, not_exported={"Error"})
+        support.check__all__(self, configparser, not_exported={"Error"})
 
 
 if __name__ == '__main__':

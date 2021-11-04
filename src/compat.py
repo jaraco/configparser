@@ -1,6 +1,7 @@
 import test.support
 import contextlib
 import sys
+import types
 
 
 def check__all__(*args, **kwargs):
@@ -8,6 +9,9 @@ def check__all__(*args, **kwargs):
         with contextlib.suppress(KeyError):
             kwargs.update(blacklist=kwargs.pop('not_exported'))
     return test.support.check__all__(*args, **kwargs)
+
+
+support = types.SimpleNamespace(**dict(vars(test.support), check__all__=check__all__))
 
 
 try:
