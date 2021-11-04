@@ -10,13 +10,7 @@ from collections.abc import Mapping
 from collections import UserDict
 from test import support
 
-try:
-    from test.support import os_helper
-except ImportError:
-    # Python 3.9
-    import test.support as os_helper  # noqa: F401
-
-from compat import check__all__
+from compat import check__all__, os_helper
 
 from backports import configparser
 
