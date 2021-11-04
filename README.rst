@@ -133,7 +133,7 @@ Versioning
 This project uses `semver <https://semver.org/spec/v2.0.0.html>`_ to
 communicate the impact of various releases while periodically syncing
 with the upstream implementation in CPython.
-`The changelog <https://github.com/jaraco/configparser/blob/master/CHANGES.rst>`_
+The `history <https://configparser.readthedocs.io/en/latest/history.html>`_
 serves as a reference indicating which versions incorporate
 which upstream functionality.
 
@@ -181,7 +181,7 @@ The project takes the following branching approach:
   CPython repository. The synchronization is currently done by manually copying
   the required files and stating from which CPython changeset they come.
 
-* The ``master`` branch holds a version of the ``3.x`` code with some tweaks
+* The ``main`` branch holds a version of the ``3.x`` code with some tweaks
   that make it compatible with older Pythons. Code on this branch must work
   on all supported Python versions. Test with ``tox`` or in CI.
 
@@ -196,9 +196,9 @@ The process works like this:
    ``configparser.py`` accordingly. Optionally, run the tests on a late
    Python 3. Commit.
 
-3. Merge the new commit to ``master``. Run tests. Commit.
+3. Merge the new commit to ``main``. Run tests. Commit.
 
-4. Make any compatibility changes on ``master``. Run tests. Commit.
+4. Make any compatibility changes on ``main``. Run tests. Commit.
 
 5. Update the docs and release the new version.
 
