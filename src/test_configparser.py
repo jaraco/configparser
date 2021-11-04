@@ -87,6 +87,7 @@ class BasicTestCase(CfgParserTestCaseClass):
             'Spacey Bar',
             'Spacey Bar From The Beginning',
             'Types',
+            'This One Has A ] In It',
         ]
 
         if self.allow_no_value:
@@ -138,6 +139,7 @@ class BasicTestCase(CfgParserTestCaseClass):
         eq(cf.get('Types', 'float'), "0.44")
         eq(cf.getboolean('Types', 'boolean'), False)
         eq(cf.get('Types', '123'), 'strange but acceptable')
+        eq(cf.get('This One Has A ] In It', 'forks'), 'spoons')
         if self.allow_no_value:
             eq(cf.get('NoValue', 'option-without-value'), None)
 
@@ -329,6 +331,8 @@ int {0[1]} 42
 float {0[0]} 0.44
 boolean {0[0]} NO
 123 {0[1]} strange but acceptable
+[This One Has A ] In It]
+  forks {0[0]} spoons
 """.format(
             self.delimiters, self.comment_prefixes
         )
@@ -411,6 +415,7 @@ boolean {0[0]} NO
                 "boolean": False,
                 123: "strange but acceptable",
             },
+            "This One Has A ] In It": {"forks": "spoons"},
         }
         if self.allow_no_value:
             config.update({"NoValue": {"option-without-value": None}})
@@ -764,31 +769,31 @@ boolean {0[0]} NO
         file1 = support.findfile("cfgparser.1")
         # check when we pass a mix of readable and non-readable files:
         cf = self.newconfig()
-        parsed_files = cf.read([file1, "nonexistent-file"])
+        parsed_files = cf.read([file1, "nonexistent-file"], encoding="utf-8")
         self.assertEqual(parsed_files, [file1])
         self.assertEqual(cf.get("Foo Bar", "foo"), "newbar")
         # check when we pass only a filename:
         cf = self.newconfig()
-        parsed_files = cf.read(file1)
+        parsed_files = cf.read(file1, encoding="utf-8")
         self.assertEqual(parsed_files, [file1])
         self.assertEqual(cf.get("Foo Bar", "foo"), "newbar")
         # check when we pass only a Path object:
         cf = self.newconfig()
-        parsed_files = cf.read(pathlib.Path(file1))
+        parsed_files = cf.read(pathlib.Path(file1), encoding="utf-8")
         self.assertEqual(parsed_files, [file1])
         self.assertEqual(cf.get("Foo Bar", "foo"), "newbar")
         # check when we passed both a filename and a Path object:
         cf = self.newconfig()
-        parsed_files = cf.read([pathlib.Path(file1), file1])
+        parsed_files = cf.read([pathlib.Path(file1), file1], encoding="utf-8")
         self.assertEqual(parsed_files, [file1, file1])
         self.assertEqual(cf.get("Foo Bar", "foo"), "newbar")
         # check when we pass only missing files:
         cf = self.newconfig()
-        parsed_files = cf.read(["nonexistent-file"])
+        parsed_files = cf.read(["nonexistent-file"], encoding="utf-8")
         self.assertEqual(parsed_files, [])
         # check when we pass no files:
         cf = self.newconfig()
-        parsed_files = cf.read([])
+        parsed_files = cf.read([], encoding="utf-8")
         self.assertEqual(parsed_files, [])
 
     def test_read_returns_file_list_with_bytestring_path(self):
@@ -797,15 +802,17 @@ boolean {0[0]} NO
         file1_bytestring = support.findfile("cfgparser.1").encode()
         # check when passing an existing bytestring path
         cf = self.newconfig()
-        parsed_files = cf.read(file1_bytestring)
+        parsed_files = cf.read(file1_bytestring, encoding="utf-8")
         self.assertEqual(parsed_files, [file1_bytestring])
         # check when passing an non-existing bytestring path
         cf = self.newconfig()
-        parsed_files = cf.read(b'nonexistent-file')
+        parsed_files = cf.read(b'nonexistent-file', encoding="utf-8")
         self.assertEqual(parsed_files, [])
         # check when passing both an existing and non-existing bytestring path
         cf = self.newconfig()
-        parsed_files = cf.read([file1_bytestring, b'nonexistent-file'])
+        parsed_files = cf.read(
+            [file1_bytestring, b'nonexistent-file'], encoding="utf-8"
+        )
         self.assertEqual(parsed_files, [file1_bytestring])
 
     # shared by subclasses
@@ -1166,8 +1173,8 @@ class MultilineValuesTestCase(BasicTestCase, unittest.TestCase):
             s = 'section{0}'.format(i)
             cf.add_section(s)
             for j in range(10):
-                cf.set(s, 'lovely_spam{0}'.format(j), self.wonderful_spam)
-        with open(os_helper.TESTFN, 'w') as f:
+                cf.set(s, 'lovely_spam{}'.format(j), self.wonderful_spam)
+        with open(os_helper.TESTFN, 'w', encoding="utf-8") as f:
             cf.write(f)
 
     def tearDown(self):
@@ -1177,7 +1184,7 @@ class MultilineValuesTestCase(BasicTestCase, unittest.TestCase):
         # We're reading from file because this is where the code changed
         # during performance updates in Python 3.2
         cf_from_file = self.newconfig()
-        with open(os_helper.TESTFN) as f:
+        with open(os_helper.TESTFN, encoding="utf-8") as f:
             cf_from_file.read_file(f)
         self.assertEqual(
             cf_from_file.get('section8', 'lovely_spam4'),
@@ -1604,7 +1611,7 @@ class CopyTestCase(BasicTestCase, unittest.TestCase):
 class FakeFile(object):
     def __init__(self):
         file_path = support.findfile("cfgparser.1")
-        with open(file_path) as f:
+        with open(file_path, encoding="utf-8") as f:
             self.lines = f.readlines()
             self.lines.reverse()
 
@@ -1631,7 +1638,7 @@ class ReadFileTestCase(unittest.TestCase):
             pass  # unfortunately we can't test bytes on this path
         for file_path in file_paths:
             parser = configparser.ConfigParser()
-            with open(file_path) as f:
+            with open(file_path, encoding="utf-8") as f:
                 parser.read_file(f)
             self.assertIn("Foo Bar", parser)
             self.assertIn("foo", parser["Foo Bar"])
@@ -2343,8 +2350,7 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
 class MiscTestCase(unittest.TestCase):
     @unittest.skipIf(not hasattr(support, 'check__all__'), "check__all__ not available")
     def test__all__(self):
-        not_exported = {"Error", "PY2"}
-        check__all__(self, configparser, not_exported=not_exported)
+        check__all__(self, configparser, not_exported={"Error"})
 
 
 class UnicodeBackportTestCase(unittest.TestCase):
