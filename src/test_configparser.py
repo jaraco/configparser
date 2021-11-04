@@ -16,6 +16,8 @@ except ImportError:
     # Python 3.9
     import test.support as os_helper  # noqa: F401
 
+from compat import check__all__
+
 from backports import configparser
 
 
@@ -2347,8 +2349,8 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
 class MiscTestCase(unittest.TestCase):
     @unittest.skipIf(not hasattr(support, 'check__all__'), "check__all__ not available")
     def test__all__(self):
-        blacklist = {"Error", "PY2"}
-        support.check__all__(self, configparser, blacklist=blacklist)
+        not_exported = {"Error", "PY2"}
+        check__all__(self, configparser, not_exported=not_exported)
 
 
 class UnicodeBackportTestCase(unittest.TestCase):
