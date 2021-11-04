@@ -139,7 +139,6 @@ ConfigParser -- responsible for parsing a list of
 """
 
 import functools
-import io
 import itertools
 import os
 import re
@@ -148,6 +147,8 @@ import warnings
 from collections import OrderedDict as _default_dict
 from collections import ChainMap as _ChainMap
 from collections.abc import MutableMapping
+
+from .compat import io
 
 __all__ = [
     "NoSectionError",
