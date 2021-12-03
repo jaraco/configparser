@@ -1,3 +1,9 @@
+v5.2.0
+======
+
+* Project now uses PEP 420 (native) namespace package for
+  ``backports`` package.
+
 v5.1.0
 ======
 
