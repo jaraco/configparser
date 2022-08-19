@@ -1121,7 +1121,7 @@ class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
         self.assertMatchesIni(cf)
 
 
-class ConfigParserTestCaseLegacyInterpolation(ConfigParserTestCase, unittest.TestCase):
+class ConfigParserTestCaseLegacyInterpolation(ConfigParserTestCase):
     config_class = configparser.ConfigParser
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", DeprecationWarning)
@@ -1154,17 +1154,13 @@ class ConfigParserTestCaseInvalidInterpolationType(unittest.TestCase):
                     configparser.ConfigParser(interpolation=value)
 
 
-class ConfigParserTestCaseNonStandardDelimiters(
-    ConfigParserTestCase, unittest.TestCase
-):
+class ConfigParserTestCaseNonStandardDelimiters(ConfigParserTestCase):
     delimiters = (':=', '$')
     comment_prefixes = ('//', '"')
     inline_comment_prefixes = ('//', '"')
 
 
-class ConfigParserTestCaseNonStandardDefaultSection(
-    ConfigParserTestCase, unittest.TestCase
-):
+class ConfigParserTestCaseNonStandardDefaultSection(ConfigParserTestCase):
     default_section = 'general'
 
 
