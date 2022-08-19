@@ -1,3 +1,10 @@
+v5.3.0
+======
+
+* Synced with Python 3.11.0rc1.
+* Packaging refresh.
+* Requires Python 3.7 or later.
+
 v5.2.0
 ======
 
