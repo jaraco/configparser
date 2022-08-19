@@ -8,7 +8,7 @@ __requires__ = ['autocommand', 'requests_toolbelt', 'packaging']
 import subprocess
 
 import autocommand
-from packaging.version import Version
+import packaging.version
 from requests_toolbelt import sessions
 
 
@@ -27,12 +27,25 @@ file_map = {
 }
 
 
+class Version(packaging.version.Version):
+    @property
+    def is_stable(self):
+        """
+        Include release candidates in stable.
+        """
+        return not self.is_prerelease or self.is_rc
+
+    @property
+    def is_rc(self):
+        return self.pre[1:] == ['rc']
+
+
 def by_tag(tag):
     return Version(tag['name'])
 
 
 def is_stable(tag):
-    return not by_tag(tag).is_prerelease
+    return not by_tag(tag).is_stable
 
 
 @autocommand.autocommand(__name__)
