@@ -1,13 +1,12 @@
+import collections
 import io
 import os
-import textwrap
-import warnings
-import unittest
 import pathlib
+import textwrap
+import unittest
+import warnings
 
 from typing import Type, Iterable
-from collections.abc import Mapping
-from collections import UserDict
 
 from compat import support, os_helper
 
@@ -19,7 +18,7 @@ def nice_literals(str):
     return str.replace("b'", "'").replace("u'", "'")
 
 
-class SortedDict(UserDict):
+class SortedDict(collections.UserDict):
     def items(self):
         return sorted(self.data.items())
 
@@ -41,13 +40,13 @@ class SortedDict(UserDict):
     __iter__ = iterkeys
 
 
-class CfgParserTestCaseClass(object):
+class CfgParserTestCaseClass:
     allow_no_value = False
     delimiters = ('=', ':')  # type: Iterable[str]
     comment_prefixes = (';', '#')  # type: Iterable[str]
     inline_comment_prefixes = (';', '#')  # type: Iterable[str]
     empty_lines_in_values = True
-    dict_type = configparser._default_dict  # type: Type[Mapping]
+    dict_type = configparser._default_dict  # type: Type[collections.abc.Mapping]
     strict = False
     default_section = configparser.DEFAULTSECT
     interpolation = configparser._UNSET
@@ -1613,7 +1612,7 @@ class CopyTestCase(BasicTestCase, unittest.TestCase):
         return cf_copy
 
 
-class FakeFile(object):
+class FakeFile:
     def __init__(self):
         file_path = support.findfile("cfgparser.1")
         with open(file_path, encoding="utf-8") as f:
@@ -2156,7 +2155,7 @@ class ConvertersTestCase(BasicTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
 
     def newconfig(self, defaults=None):
-        instance = super(ConvertersTestCase, self).newconfig(defaults=defaults)
+        instance = super().newconfig(defaults=defaults)
         instance.converters['list'] = lambda v: [
             e.strip() for e in v.split() if e.strip()
         ]
@@ -2270,7 +2269,7 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
             ):
                 if section == option:
                     return True
-                return super(StrangeConfigParser, self).getboolean(
+                return super().getboolean(
                     section, option, raw=raw, vars=vars, fallback=fallback
                 )
 
