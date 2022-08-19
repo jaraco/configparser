@@ -1123,7 +1123,9 @@ class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
 
 class ConfigParserTestCaseLegacyInterpolation(ConfigParserTestCase, unittest.TestCase):
     config_class = configparser.ConfigParser
-    interpolation = configparser.LegacyInterpolation()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", DeprecationWarning)
+        interpolation = configparser.LegacyInterpolation()
 
     def test_set_malformatted_interpolation(self):
         cf = self.fromstring(
@@ -1142,6 +1144,14 @@ class ConfigParserTestCaseLegacyInterpolation(ConfigParserTestCase, unittest.Tes
         # bug #5741: double percents are *not* malformed
         cf.set("sect", "option2", "foo%%bar")
         self.assertEqual(cf.get("sect", "option2"), "foo%%bar")
+
+
+class ConfigParserTestCaseInvalidInterpolationType(unittest.TestCase):
+    def test_error_on_wrong_type_for_interpolation(self):
+        for value in [configparser.ExtendedInterpolation, 42, "a string"]:
+            with self.subTest(value=value):
+                with self.assertRaises(TypeError):
+                    configparser.ConfigParser(interpolation=value)
 
 
 class ConfigParserTestCaseNonStandardDelimiters(
@@ -1830,6 +1840,14 @@ class CoverageOneHundredTestCase(unittest.TestCase):
             configparser.SafeConfigParser()
         for warning in w:
             self.assertTrue(warning.category is DeprecationWarning)
+
+    def test_legacyinterpolation_deprecation(self):
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always", DeprecationWarning)
+            configparser.LegacyInterpolation()
+        self.assertGreaterEqual(len(w), 1)
+        for warning in w:
+            self.assertIs(warning.category, DeprecationWarning)
 
     def test_sectionproxy_repr(self):
         parser = configparser.ConfigParser()
