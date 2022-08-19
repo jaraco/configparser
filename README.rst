@@ -193,8 +193,7 @@ The process works like this:
    changes with a nice reference to the relevant upstream commit hash.
 
 2. Check for new names in ``__all__`` and update imports in
-   ``configparser.py`` accordingly. Optionally, run the tests on a late
-   Python 3. Commit.
+   ``configparser.py`` accordingly. Commit.
 
 3. Merge the new commit to ``main``. Run tests. Commit.
 
