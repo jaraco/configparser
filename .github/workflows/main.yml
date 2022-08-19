@@ -13,7 +13,8 @@ jobs:
         platform:
         - ubuntu-latest
         - macos-latest
-        - windows-latest
+        # disabled due to #58
+        # - windows-latest
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
