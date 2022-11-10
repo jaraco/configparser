@@ -1,10 +1,7 @@
 .. image:: https://img.shields.io/pypi/v/configparser.svg
-   :target: `PyPI link`_
+   :target: https://pypi.org/project/configparser
 
 .. image:: https://img.shields.io/pypi/pyversions/configparser.svg
-   :target: `PyPI link`_
-
-.. _PyPI link: https://pypi.org/project/configparser
 
 .. image:: https://github.com/jaraco/configparser/workflows/tests/badge.svg
    :target: https://github.com/jaraco/configparser/actions?query=workflow%3A%22tests%22
