@@ -8,11 +8,6 @@ Welcome to |project| documentation!
 
 .. tidelift-referral-banner::
 
-.. automodule:: configparser
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Indices and tables
 ==================
