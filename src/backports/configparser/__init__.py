@@ -674,7 +674,6 @@ class RawConfigParser(MutableMapping):
         interpolation=_UNSET,
         converters=_UNSET,
     ):
-
         self._dict = dict_type
         self._sections = self._dict()
         self._defaults = self._dict()
