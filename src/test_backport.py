@@ -54,7 +54,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
         cp['łąka2'] = {}
         cp.set('section', 'łąka1', 'value')
         cp['section']['łąka2'] = 'value'
-        self.assertEqual(set(cp['section']), set(['łąka1', 'łąka2']))
+        self.assertEqual(set(cp['section']), {'łąka1', 'łąka2'})
         cp['new'] = {'łąka': 'value'}
         cp.set('section', 'key', 'łąka')
         cp['section']['key'] = 'łąka'
