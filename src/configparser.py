@@ -11,7 +11,6 @@ from __future__ import unicode_literals
 from backports.configparser import (
     RawConfigParser,
     ConfigParser,
-    SafeConfigParser,
     SectionProxy,
     Interpolation,
     BasicInterpolation,
@@ -34,7 +33,7 @@ from backports.configparser import (
 
 from backports.configparser import Error, _UNSET, _default_dict, _ChainMap  # noqa: F401
 
-__all__ = [
+__all__ = (
     "NoSectionError",
     "DuplicateOptionError",
     "DuplicateSectionError",
@@ -46,7 +45,6 @@ __all__ = [
     "ParsingError",
     "MissingSectionHeaderError",
     "ConfigParser",
-    "SafeConfigParser",
     "RawConfigParser",
     "Interpolation",
     "BasicInterpolation",
@@ -56,6 +54,6 @@ __all__ = [
     "ConverterMapping",
     "DEFAULTSECT",
     "MAX_INTERPOLATION_DEPTH",
-]
+)
 
 # NOTE: names missing from __all__ imported anyway for backwards compatibility.
