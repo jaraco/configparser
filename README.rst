@@ -153,22 +153,6 @@ Jason R. Coombs:
 
 * `configparser issue tracker <https://github.com/jaraco/configparser/issues>`_
 
-For Enterprise
-==============
-
-Available as part of the Tidelift Subscription.
-
-This project and the maintainers of thousands of other packages are working with Tidelift to deliver one enterprise subscription that covers all of the open source you use.
-
-`Learn more <https://tidelift.com/subscription/pkg/pypi-configparser?utm_source=pypi-configparser&utm_medium=referral&utm_campaign=github>`_.
-
-Security Contact
-----------------
-
-To report a security vulnerability, please use the
-`Tidelift security contact <https://tidelift.com/security>`_.
-Tidelift will coordinate the fix and disclosure.
-
 Conversion Process
 ------------------
 
@@ -229,3 +213,12 @@ Footnotes
        business logic without worrying about which data came from which source.
        You can freely exchange the data you store between sources.  Only
        reading/writing files requires encoding your text to bytes.
+
+For Enterprise
+==============
+
+Available as part of the Tidelift Subscription.
+
+This project and the maintainers of thousands of other packages are working with Tidelift to deliver one enterprise subscription that covers all of the open source you use.
+
+`Learn more <https://tidelift.com/subscription/pkg/pypi-configparser?utm_source=pypi-configparser&utm_medium=referral&utm_campaign=github>`_.
