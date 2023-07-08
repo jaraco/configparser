@@ -57,8 +57,8 @@ jobs:
         - python: pypy3.9
           platform: ubuntu-latest
         exclude:
-        # pip 20 chokes on non-ascii in setup.cfg (#58)
-        - python: "3.7"
+        # pip 21 chokes on non-ascii in setup.cfg (#67)
+        - python: "3.8"
           platform: windows-latest
     runs-on: ${{ matrix.platform }}
     continue-on-error: ${{ matrix.python == '3.12' }}
