@@ -1,12 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
 """Convenience module importing everything from backports.configparser."""
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
 
 from backports.configparser import (
     RawConfigParser,
@@ -31,6 +24,7 @@ from backports.configparser import (
     MAX_INTERPOLATION_DEPTH,
 )
 
+# names missing from __all__ imported anyway for backwards compatibility.
 from backports.configparser import Error, _UNSET, _default_dict, _ChainMap  # noqa: F401
 
 __all__ = (
@@ -55,5 +49,3 @@ __all__ = (
     "DEFAULTSECT",
     "MAX_INTERPOLATION_DEPTH",
 )
-
-# NOTE: names missing from __all__ imported anyway for backwards compatibility.
