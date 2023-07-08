@@ -40,7 +40,7 @@ For detailed documentation consult the vanilla version at
 http://docs.python.org/3/library/configparser.html.
 
 Why you'll love ``configparser``
---------------------------------
+================================
 
 Whereas almost completely compatible with its older brother, ``configparser``
 sports a bunch of interesting new features:
@@ -112,7 +112,7 @@ sports a bunch of interesting new features:
 * many smaller tweaks, updates and fixes
 
 A few words about Unicode
--------------------------
+=========================
 
 ``configparser`` comes from Python 3 and as such it works well with Unicode.
 The library is generally cleaned up in terms of internal data storage and
@@ -129,7 +129,7 @@ you should explicitly state encoding is when you either read from an external
 source (e.g. a file) or write back.
 
 Versioning
-----------
+==========
 
 This project uses `semver <https://semver.org/spec/v2.0.0.html>`_ to
 communicate the impact of various releases while periodically syncing
@@ -143,7 +143,7 @@ Prior to the ``4.0.0`` release, `another scheme
 was used to associate the CPython and backports releases.
 
 Maintenance
------------
+===========
 
 This backport was originally authored by Łukasz Langa, the current vanilla
 ``configparser`` maintainer for CPython and is currently maintained by
@@ -154,7 +154,7 @@ Jason R. Coombs:
 * `configparser issue tracker <https://github.com/jaraco/configparser/issues>`_
 
 Conversion Process
-------------------
+==================
 
 This section is technical and should bother you only if you are wondering how
 this backport is produced. If the implementation details of this backport are
@@ -188,7 +188,7 @@ The process works like this:
 
 
 Footnotes
----------
+=========
 
 .. [1] To somewhat ease migration, passing bytestrings is still supported but
        they are converted to Unicode for internal storage anyway. This means
