@@ -8,7 +8,7 @@ import warnings
 
 from typing import Type, Iterable
 
-from compat import support, os_helper
+from .compat import support, os_helper
 
 from backports import configparser
 
