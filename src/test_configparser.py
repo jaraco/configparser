@@ -42,11 +42,11 @@ class SortedDict(collections.UserDict):
 
 class CfgParserTestCaseClass:
     allow_no_value = False
-    delimiters = ('=', ':')  # type: Iterable[str]
-    comment_prefixes = (';', '#')  # type: Iterable[str]
-    inline_comment_prefixes = (';', '#')  # type: Iterable[str]
+    delimiters: Iterable[str] = ('=', ':')
+    comment_prefixes: Iterable[str] = (';', '#')
+    inline_comment_prefixes: Iterable[str] = (';', '#')
     empty_lines_in_values = True
-    dict_type = configparser._default_dict  # type: Type[collections.abc.Mapping]
+    dict_type: Type[collections.abc.Mapping] = configparser._default_dict
     strict = False
     default_section = configparser.DEFAULTSECT
     interpolation = configparser._UNSET
