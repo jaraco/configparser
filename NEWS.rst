@@ -1,3 +1,18 @@
+v6.0.0
+======
+
+Features
+--------
+
+- Require Python 3.8 or later.
+
+
+Deprecations and Removals
+-------------------------
+
+- Synced with CPython 3.12.0b2. Removes ``SafeConfigParser`` and ``filename`` parameter.
+
+
 v5.3.0
 ======
 
