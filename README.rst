@@ -3,7 +3,7 @@
 
 .. image:: https://img.shields.io/pypi/pyversions/configparser.svg
 
-.. image:: https://github.com/jaraco/configparser/workflows/tests/badge.svg
+.. image:: https://github.com/jaraco/configparser/actions/workflows/main.yml/badge.svg
    :target: https://github.com/jaraco/configparser/actions?query=workflow%3A%22tests%22
    :alt: tests
 
