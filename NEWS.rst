@@ -1,3 +1,12 @@
+v6.0.1
+======
+
+Bugfixes
+--------
+
+- Fixed failing tests introduced by upstream test suite changes. (#70)
+
+
 v6.0.0
 ======
 
