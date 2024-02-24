@@ -2,6 +2,7 @@ import test.support
 import contextlib
 import sys
 import types
+import pathlib
 
 
 def check__all__(*args, **kwargs):
@@ -19,3 +20,13 @@ try:
 except ImportError:  # pragma: no cover
     # Python 3.9
     import test.support as os_helper  # noqa: F401
+
+
+def find_file(filename, subdir=None):
+    """
+    Replacement for support.findfile to find the files locally.
+    """
+    return str(pathlib.Path('tests') / filename)
+
+
+support.findfile = find_file
