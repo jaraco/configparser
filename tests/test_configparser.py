@@ -331,9 +331,7 @@ boolean {0[0]} NO
 123 {0[1]} strange but acceptable
 [This One Has A ] In It]
   forks {0[0]} spoons
-""".format(
-            self.delimiters, self.comment_prefixes
-        )
+""".format(self.delimiters, self.comment_prefixes)
         if self.allow_no_value:
             config_string += "[NoValue]\n" "option-without-value\n"
         cf = self.fromstring(config_string)
@@ -346,9 +344,7 @@ boolean {0[0]} NO
                     [Duplicate Options Here]
                     option {0[0]} with a value
                     option {0[1]} with another value
-                """.format(
-                            self.delimiters
-                        )
+                """.format(self.delimiters)
                     )
                 )
             with self.assertRaises(configparser.DuplicateSectionError):
@@ -359,9 +355,7 @@ boolean {0[0]} NO
                     completely different {0[0]} True
                     [And Now For Something]
                     the larch {0[1]} 1
-                """.format(
-                            self.delimiters
-                        )
+                """.format(self.delimiters)
                     )
                 )
         else:
@@ -371,9 +365,7 @@ boolean {0[0]} NO
                 [Duplicate Options Here]
                 option {0[0]} with a value
                 option {0[1]} with another value
-            """.format(
-                        self.delimiters
-                    )
+            """.format(self.delimiters)
                 )
             )
 
@@ -384,9 +376,7 @@ boolean {0[0]} NO
                 completely different {0[0]} True
                 [And Now For Something]
                 the larch {0[1]} 1
-            """.format(
-                        self.delimiters
-                    )
+            """.format(self.delimiters)
                 )
             )
 
@@ -424,24 +414,20 @@ boolean {0[0]} NO
             with self.assertRaises(configparser.DuplicateSectionError):
                 cf.read_dict({'1': {'key': 'value'}, 1: {'key2': 'value2'}})
             with self.assertRaises(configparser.DuplicateOptionError):
-                cf.read_dict(
-                    {
-                        "Duplicate Options Here": {
-                            'option': 'with a value',
-                            'OPTION': 'with another value',
-                        }
-                    }
-                )
-        else:
-            cf.read_dict({'section': {'key': 'value'}, 'SECTION': {'key2': 'value2'}})
-            cf.read_dict(
-                {
+                cf.read_dict({
                     "Duplicate Options Here": {
                         'option': 'with a value',
                         'OPTION': 'with another value',
                     }
+                })
+        else:
+            cf.read_dict({'section': {'key': 'value'}, 'SECTION': {'key2': 'value2'}})
+            cf.read_dict({
+                "Duplicate Options Here": {
+                    'option': 'with a value',
+                    'OPTION': 'with another value',
                 }
-            )
+            })
 
     def test_case_sensitivity(self):
         cf = self.newconfig()
@@ -671,9 +657,7 @@ boolean {0[0]} NO
                     what about this{equals}True
                     [Foo]
                     oops{equals}this won't
-                """.format(
-                            equals=self.delimiters[0]
-                        )
+                """.format(equals=self.delimiters[0])
                     ),
                     source='<foo-bar>',
                 )
@@ -849,9 +833,7 @@ boolean {0[0]} NO
             name {0[0]} %(value)s
             key{0[1]} |%(name)s|
             getdefault{0[1]} |%(default)s|
-        """.format(
-                self.delimiters
-            ),
+        """.format(self.delimiters),
             defaults={"default": "<default>"},
         )
         L = list(cf.items("section", vars={'value': 'value'}))
@@ -869,9 +851,7 @@ boolean {0[0]} NO
             name2 {0[0]} value2
             [section3]
             name3 {0[0]} value3
-        """.format(
-                self.delimiters
-            ),
+        """.format(self.delimiters),
             defaults={"default": "<default>"},
         )
         self.assertEqual(cf.popitem()[0], 'section1')
@@ -903,9 +883,7 @@ boolean {0[0]} NO
             name2 {0[0]} value2
             [section3]
             name3 {0[0]} value3
-        """.format(
-                self.delimiters
-            ),
+        """.format(self.delimiters),
             defaults={"nameD": "valueD"},
         )
         self.assertEqual(set(cf['section1'].keys()), set(['name1', 'named']))
@@ -945,9 +923,7 @@ boolean {0[0]} NO
             """\
             [DEFAULT]
             test {0} test
-            invalid""".format(
-                self.delimiters[0]
-            )
+            invalid""".format(self.delimiters[0])
         )
         cf = self.newconfig()
         with self.assertRaises(configparser.ParsingError):
@@ -1011,14 +987,12 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
             )
 
     def test_items(self):
-        self.check_items_config(
-            [
-                ('default', '<default>'),
-                ('getdefault', '|<default>|'),
-                ('key', '|value|'),
-                ('name', 'value'),
-            ]
-        )
+        self.check_items_config([
+            ('default', '<default>'),
+            ('getdefault', '|<default>|'),
+            ('key', '|value|'),
+            ('name', 'value'),
+        ])
 
     def test_safe_interpolation(self):
         # See https://bugs.python.org/issue511737
@@ -1214,14 +1188,12 @@ class RawConfigParserTestCase(BasicTestCase, unittest.TestCase):
         )
 
     def test_items(self):
-        self.check_items_config(
-            [
-                ('default', '<default>'),
-                ('getdefault', '|%(default)s|'),
-                ('key', '|%(name)s|'),
-                ('name', '%(value)s'),
-            ]
-        )
+        self.check_items_config([
+            ('default', '<default>'),
+            ('getdefault', '|%(default)s|'),
+            ('key', '|%(name)s|'),
+            ('name', '%(value)s'),
+        ])
 
     def test_set_nonstring_types(self):
         cf = self.newconfig()
@@ -1760,8 +1732,9 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         self.assertEqual(error.args, ('section', 'option', None, None))
         self.assertEqual(
             str(error),
-            "Option {0!r} in section {1!r} already "
-            "exists".format('option', 'section'),
+            "Option {0!r} in section {1!r} already " "exists".format(
+                'option', 'section'
+            ),
         )
 
     def test_interpolation_depth_error(self):

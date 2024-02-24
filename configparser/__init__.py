@@ -1,6 +1,5 @@
 """Convenience module importing everything from backports.configparser."""
 
-
 from backports.configparser import (
     RawConfigParser,
     ConfigParser,
