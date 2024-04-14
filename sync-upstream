@@ -7,6 +7,7 @@ Sync files from upstream release.
 __requires__ = ['autocommand', 'requests_toolbelt', 'packaging']
 
 
+import pathlib
 import subprocess
 
 import autocommand
@@ -19,13 +20,13 @@ gh_content = sessions.BaseUrlSession(
 gh_api = sessions.BaseUrlSession(
     'https://api.github.com/repos/python/cpython/')
 
-file_map = {
-    'Lib/configparser.py': 'Lib/configparser.py',
-    'Lib/test/test_configparser.py': 'Lib/test/test_configparser.py',
-    'Lib/test/configdata/cfgparser.1': 'Lib/test/configdata/cfgparser.1',
-    'Lib/test/configdata/cfgparser.2': 'Lib/test/configdata/cfgparser.2',
-    'Lib/test/configdata/cfgparser.3': 'Lib/test/configdata/cfgparser.3',
-}
+paths = (
+    'Lib/configparser.py',
+    'Lib/test/test_configparser.py',
+    'Lib/test/configdata/cfgparser.1',
+    'Lib/test/configdata/cfgparser.2',
+    'Lib/test/configdata/cfgparser.3',
+)
 
 
 class Version(packaging.version.Version):
@@ -55,11 +56,10 @@ def run(pre=False):
     filtered = tags if pre else filter(is_stable, tags)
     tag = max(filtered, key=by_tag)
     version = tag['name']
-    for src, dst in file_map.items():
-        resp = gh_content.get(f'{version}/{src}')
+    for path in paths:
+        resp = gh_content.get(f'{version}/{path}')
         resp.raise_for_status()
-        with open(dst, 'wb') as out:
-            out.write(resp.content)
+        pathlib.Path(path).write_bytes(resp.content)
     cmd = [
         'git', 'commit',
         '-a',
