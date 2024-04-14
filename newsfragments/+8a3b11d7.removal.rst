@@ -1,0 +1,1 @@
+Remove 'configparser' as a top-level name, as it's already masked by the stdlib on all supported Pythons.

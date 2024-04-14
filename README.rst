@@ -27,11 +27,6 @@ simply import it explicitly as a backport::
 
   from backports import configparser
 
-To use the backport on Python 2 and the built-in version on
-Python 3, use the standard invocation::
-
-  import configparser
-
 For detailed documentation consult the vanilla version at
 http://docs.python.org/3/library/configparser.html.
 
