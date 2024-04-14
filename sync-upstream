@@ -47,7 +47,7 @@ def by_tag(tag):
 
 
 def is_stable(tag):
-    return not by_tag(tag).is_stable
+    return by_tag(tag).is_stable
 
 
 @autocommand.autocommand(__name__)
