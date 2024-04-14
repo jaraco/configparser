@@ -168,7 +168,7 @@ The project takes the following branching approach:
 
 The process works like this:
 
-1. In the ``cpython`` branch, run ``pip-run -- sync-upstream.py``, which
+1. In the ``cpython`` branch, run ``./sync-upstream``, which
    downloads the latest stable release of Python and copies the relevant
    files from there into their new locations and then commits those
    changes with a nice reference to the relevant upstream commit hash.
