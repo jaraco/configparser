@@ -4,7 +4,6 @@ import os
 import pathlib
 import textwrap
 import unittest
-import warnings
 
 from typing import Type, Iterable
 
@@ -559,7 +558,7 @@ boolean {0[0]} NO
             )
             self.assertEqual(e.args, ('<???>',))
             # read_file on a real file
-            tricky = support.findfile("cfgparser.3")
+            tricky = support.findfile("cfgparser.3", subdir="configdata")
             if self.delimiters[0] == '=':
                 error = configparser.ParsingError
                 expected = (tricky,)
@@ -679,6 +678,23 @@ boolean {0[0]} NO
             )
             self.assertEqual(e.args, ("Bar", "opt", "<dict>", None))
 
+    def test_get_after_duplicate_option_error(self):
+        cf = self.newconfig()
+        ini = textwrap.dedent(
+            """\
+            [Foo]
+            x{equals}1
+            y{equals}2
+            y{equals}3
+        """.format(equals=self.delimiters[0])
+        )
+        if self.strict:
+            with self.assertRaises(configparser.DuplicateOptionError):
+                cf.read_string(ini)
+        else:
+            cf.read_string(ini)
+        self.assertEqual(cf.get('Foo', 'x'), '1')
+
     def test_write(self):
         config_string = (
             "[Long Line]\n"
@@ -748,7 +764,7 @@ boolean {0[0]} NO
     def test_read_returns_file_list(self):
         if self.delimiters[0] != '=':
             self.skipTest('incompatible format')
-        file1 = support.findfile("cfgparser.1")
+        file1 = support.findfile("cfgparser.1", subdir="configdata")
         # check when we pass a mix of readable and non-readable files:
         cf = self.newconfig()
         parsed_files = cf.read([file1, "nonexistent-file"], encoding="utf-8")
@@ -781,7 +797,7 @@ boolean {0[0]} NO
     def test_read_returns_file_list_with_bytestring_path(self):
         if self.delimiters[0] != '=':
             self.skipTest('incompatible format')
-        file1_bytestring = support.findfile("cfgparser.1").encode()
+        file1_bytestring = support.findfile("cfgparser.1", subdir="configdata").encode()
         # check when passing an existing bytestring path
         cf = self.newconfig()
         parsed_files = cf.read(file1_bytestring, encoding="utf-8")
@@ -956,15 +972,6 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
                     "something %(with11)s lots of interpolation (11 steps)",
                 ),
             )
-        elif isinstance(self.interpolation, configparser.LegacyInterpolation):
-            self.assertEqual(
-                e.args,
-                (
-                    "bar11",
-                    "Foo",
-                    "something %(with11)s lots of interpolation (11 steps)",
-                ),
-            )
 
     def test_interpolation_missing_value(self):
         cf = self.get_interpolation_config()
@@ -978,10 +985,6 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
         self.assertEqual(e.section, "Interpolation Error")
         self.assertEqual(e.option, "name")
         if self.interpolation == configparser._UNSET:
-            self.assertEqual(
-                e.args, ('name', 'Interpolation Error', '%(reference)s', 'reference')
-            )
-        elif isinstance(self.interpolation, configparser.LegacyInterpolation):
             self.assertEqual(
                 e.args, ('name', 'Interpolation Error', '%(reference)s', 'reference')
             )
@@ -1006,9 +1009,6 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
         self.assertEqual(cf.get("section", "ok"), "xxx/%s")
         if self.interpolation == configparser._UNSET:
             self.assertEqual(cf.get("section", "not_ok"), "xxx/xxx/%s")
-        elif isinstance(self.interpolation, configparser.LegacyInterpolation):
-            with self.assertRaises(TypeError):
-                cf.get("section", "not_ok")
 
     def test_set_malformatted_interpolation(self):
         cf = self.fromstring(
@@ -1092,31 +1092,6 @@ class ConfigParserTestCaseNoInterpolation(BasicTestCase, unittest.TestCase):
         cf = CustomConfigParser()
         cf.read_string(self.ini)
         self.assertMatchesIni(cf)
-
-
-class ConfigParserTestCaseLegacyInterpolation(ConfigParserTestCase):
-    config_class = configparser.ConfigParser
-    with warnings.catch_warnings():
-        warnings.simplefilter("ignore", DeprecationWarning)
-        interpolation = configparser.LegacyInterpolation()
-
-    def test_set_malformatted_interpolation(self):
-        cf = self.fromstring(
-            "[sect]\n" "option1{eq}foo\n".format(eq=self.delimiters[0])
-        )
-
-        self.assertEqual(cf.get('sect', "option1"), "foo")
-
-        cf.set("sect", "option1", "%foo")
-        self.assertEqual(cf.get('sect', "option1"), "%foo")
-        cf.set("sect", "option1", "foo%")
-        self.assertEqual(cf.get('sect', "option1"), "foo%")
-        cf.set("sect", "option1", "f%oo")
-        self.assertEqual(cf.get('sect', "option1"), "f%oo")
-
-        # bug #5741: double percents are *not* malformed
-        cf.set("sect", "option2", "foo%%bar")
-        self.assertEqual(cf.get("sect", "option2"), "foo%%bar")
 
 
 class ConfigParserTestCaseInvalidInterpolationType(unittest.TestCase):
@@ -1237,7 +1212,7 @@ class RawConfigParserTestSambaConf(CfgParserTestCaseClass, unittest.TestCase):
     empty_lines_in_values = False
 
     def test_reading(self):
-        smbconf = support.findfile("cfgparser.2")
+        smbconf = support.findfile("cfgparser.2", subdir="configdata")
         # check when we pass a mix of readable and non-readable files:
         cf = self.newconfig()
         parsed_files = cf.read([smbconf, "nonexistent-file"], encoding='utf-8')
@@ -1455,7 +1430,7 @@ class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass, unittest.TestCase):
     allow_no_value = True
 
     def test_cfgparser_dot_3(self):
-        tricky = support.findfile("cfgparser.3")
+        tricky = support.findfile("cfgparser.3", subdir="configdata")
         cf = self.newconfig()
         self.assertEqual(len(cf.read(tricky, encoding='utf-8')), 1)
         self.assertEqual(
@@ -1492,7 +1467,7 @@ class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass, unittest.TestCase):
         self.assertEqual(cf.get('more interpolation', 'lets'), 'go shopping')
 
     def test_unicode_failure(self):
-        tricky = support.findfile("cfgparser.3")
+        tricky = support.findfile("cfgparser.3", subdir="configdata")
         cf = self.newconfig()
         with self.assertRaises(UnicodeDecodeError):
             cf.read(tricky, encoding='ascii')
@@ -1586,7 +1561,7 @@ class CopyTestCase(BasicTestCase, unittest.TestCase):
 
 class FakeFile:
     def __init__(self):
-        file_path = support.findfile("cfgparser.1")
+        file_path = support.findfile("cfgparser.1", subdir="configdata")
         with open(file_path, encoding="utf-8") as f:
             self.lines = f.readlines()
             self.lines.reverse()
@@ -1607,7 +1582,7 @@ def readline_generator(f):
 
 class ReadFileTestCase(unittest.TestCase):
     def test_file(self):
-        file_paths = [support.findfile("cfgparser.1")]
+        file_paths = [support.findfile("cfgparser.1", subdir="configdata")]
         try:
             file_paths.append(file_paths[0].encode('utf8'))
         except UnicodeEncodeError:
@@ -1719,6 +1694,28 @@ class ReadFileTestCase(unittest.TestCase):
             "File contains no section headers.\nfile: 'badbad', line: 1\n" "'[badbad'",
         )
 
+    def test_keys_without_value_with_extra_whitespace(self):
+        lines = [
+            '[SECT]\n',
+            'KEY1\n',
+            ' KEY2 = VAL2\n',  # note the Space before the key!
+        ]
+        parser = configparser.ConfigParser(
+            comment_prefixes="",
+            allow_no_value=True,
+            strict=False,
+            delimiters=('=',),
+            interpolation=None,
+        )
+        with self.assertRaises(configparser.MultilineContinuationError) as dse:
+            parser.read_file(lines)
+        self.assertEqual(
+            str(dse.exception),
+            "Key without value continued with an indented line.\n"
+            "file: '<???>', line: 3\n"
+            "' KEY2 = VAL2\\n'",
+        )
+
 
 class CoverageOneHundredTestCase(unittest.TestCase):
     """Covers edge cases in the codebase."""
@@ -1773,14 +1770,6 @@ class CoverageOneHundredTestCase(unittest.TestCase):
             str(cm.exception),
             "bad interpolation variable " "reference {0!r}".format('%(()'),
         )
-
-    def test_legacyinterpolation_deprecation(self):
-        with warnings.catch_warnings(record=True) as w:
-            warnings.simplefilter("always", DeprecationWarning)
-            configparser.LegacyInterpolation()
-        self.assertGreaterEqual(len(w), 1)
-        for warning in w:
-            self.assertIs(warning.category, DeprecationWarning)
 
     def test_sectionproxy_repr(self):
         parser = configparser.ConfigParser()
@@ -2295,6 +2284,55 @@ class BlatantOverrideConvertersTestCase(unittest.TestCase):
             self.assertEqual(cfg['one'].getlen('one'), 5)
         with self.assertRaises(AttributeError):
             self.assertEqual(cfg['two'].getlen('one'), 5)
+
+
+class SectionlessTestCase(unittest.TestCase):
+    def fromstring(self, string):
+        cfg = configparser.ConfigParser(allow_unnamed_section=True)
+        cfg.read_string(string)
+        return cfg
+
+    def test_no_first_section(self):
+        cfg1 = self.fromstring("""
+        a = 1
+        b = 2
+        [sect1]
+        c = 3
+        """)
+
+        self.assertEqual(
+            set([configparser.UNNAMED_SECTION, 'sect1']), set(cfg1.sections())
+        )
+        self.assertEqual('1', cfg1[configparser.UNNAMED_SECTION]['a'])
+        self.assertEqual('2', cfg1[configparser.UNNAMED_SECTION]['b'])
+        self.assertEqual('3', cfg1['sect1']['c'])
+
+        output = io.StringIO()
+        cfg1.write(output)
+        cfg2 = self.fromstring(output.getvalue())
+
+        # self.assertEqual(set([configparser.UNNAMED_SECTION, 'sect1']), set(cfg2.sections()))
+        self.assertEqual('1', cfg2[configparser.UNNAMED_SECTION]['a'])
+        self.assertEqual('2', cfg2[configparser.UNNAMED_SECTION]['b'])
+        self.assertEqual('3', cfg2['sect1']['c'])
+
+    def test_no_section(self):
+        cfg1 = self.fromstring("""
+        a = 1
+        b = 2
+        """)
+
+        self.assertEqual([configparser.UNNAMED_SECTION], cfg1.sections())
+        self.assertEqual('1', cfg1[configparser.UNNAMED_SECTION]['a'])
+        self.assertEqual('2', cfg1[configparser.UNNAMED_SECTION]['b'])
+
+        output = io.StringIO()
+        cfg1.write(output)
+        cfg2 = self.fromstring(output.getvalue())
+
+        self.assertEqual([configparser.UNNAMED_SECTION], cfg2.sections())
+        self.assertEqual('1', cfg2[configparser.UNNAMED_SECTION]['a'])
+        self.assertEqual('2', cfg2[configparser.UNNAMED_SECTION]['b'])
 
 
 class MiscTestCase(unittest.TestCase):
