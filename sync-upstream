@@ -1,3 +1,5 @@
+#!py -m pip-run
+
 """
 Sync files from upstream release.
 """
