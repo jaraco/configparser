@@ -173,10 +173,10 @@ The process works like this:
    files from there into their new locations and then commits those
    changes with a nice reference to the relevant upstream commit hash.
 
-2. Check for new names in ``__all__`` and update imports in
-   ``configparser.py`` accordingly. Commit.
+2. Merge the new commit to ``main``.
 
-3. Merge the new commit to ``main``. Run tests. Commit.
+3. Check for new names in ``__all__`` and update imports in
+   ``configparser/__init__.py`` accordingly. Run tests. Commit.
 
 4. Make any compatibility changes on ``main``. Run tests. Commit.
 
