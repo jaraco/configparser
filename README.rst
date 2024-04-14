@@ -158,17 +158,17 @@ not important for you, feel free to ignore the following content.
 
 The project takes the following branching approach:
 
-* The ``3.x`` branch holds unchanged files synchronized from the upstream
+* The ``cpython`` branch holds unchanged files synchronized from the upstream
   CPython repository. The synchronization is currently done by manually copying
   the required files and stating from which CPython changeset they come.
 
-* The ``main`` branch holds a version of the ``3.x`` code with some tweaks
+* The ``main`` branch holds a version of the ``cpython`` code with some tweaks
   that make it compatible with older Pythons. Code on this branch must work
   on all supported Python versions. Test with ``tox`` or in CI.
 
 The process works like this:
 
-1. In the ``3.x`` branch, run ``pip-run -- sync-upstream.py``, which
+1. In the ``cpython`` branch, run ``pip-run -- sync-upstream.py``, which
    downloads the latest stable release of Python and copies the relevant
    files from there into their new locations and then commits those
    changes with a nice reference to the relevant upstream commit hash.
