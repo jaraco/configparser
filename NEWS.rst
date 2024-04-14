@@ -1,3 +1,13 @@
+v7.0.0
+======
+
+Deprecations and Removals
+-------------------------
+
+- Refreshed with implementation from CPython 3.13.0a6.
+- Remove 'configparser' as a top-level name, as it's already masked by the stdlib on all supported Pythons.
+
+
 v6.0.1
 ======
 
