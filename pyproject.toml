@@ -12,7 +12,15 @@ maintainers = [
 ]
 description = "Updated configparser from stdlib for earlier Pythons."
 readme = "README.rst"
-keywords = ["configparser ini parsing conf cfg configuration file"]
+keywords = [
+	"configparser",
+	"ini",
+	"parsing",
+	"conf",
+	"cfg",
+	"configuration",
+	"file",
+]
 classifiers = [
 	"Development Status :: 5 - Production/Stable",
 	"Intended Audience :: Developers",
@@ -53,7 +61,5 @@ docs = [
 
 	# local
 ]
-platforms = ["any"]
-# coding: utf-8
 
 [tool.setuptools_scm]
