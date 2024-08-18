@@ -580,13 +580,13 @@ class ExtendedInterpolation(Interpolation):
 
 
 class _ReadState:
-    elements_added : set[str]
-    cursect : dict[str, str] | None = None
-    sectname : str | None = None
-    optname : str | None = None
-    lineno : int = 0
-    indent_level : int = 0
-    errors : list[ParsingError]
+    elements_added: set[str]
+    cursect: dict[str, str] | None = None
+    sectname: str | None = None
+    optname: str | None = None
+    lineno: int = 0
+    indent_level: int = 0
+    errors: list[ParsingError]
 
     def __init__(self):
         self.elements_added = set()
@@ -703,8 +703,7 @@ class RawConfigParser(MutableMapping):
             if allow_no_value:
                 self._optcre = re.compile(self._OPT_NV_TMPL.format(delim=d), re.VERBOSE)
             else:
-                self._optcre = re.compile(self._OPT_TMPL.format(delim=d),
-                                          re.VERBOSE)
+                self._optcre = re.compile(self._OPT_TMPL.format(delim=d), re.VERBOSE)
         self._prefixes = types.SimpleNamespace(
             full=tuple(comment_prefixes or ()),
             inline=tuple(inline_comment_prefixes or ()),
