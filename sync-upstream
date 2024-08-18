@@ -4,7 +4,11 @@
 Sync files from upstream release.
 """
 
-__requires__ = ['autocommand', 'requests_toolbelt', 'packaging']
+__requires__ = [
+    'autocommand',
+    'requests_toolbelt',
+    'packaging',
+]
 
 
 import pathlib
@@ -16,9 +20,9 @@ from requests_toolbelt import sessions
 
 
 gh_content = sessions.BaseUrlSession(
-    'https://raw.githubusercontent.com/python/cpython/')
-gh_api = sessions.BaseUrlSession(
-    'https://api.github.com/repos/python/cpython/')
+    'https://raw.githubusercontent.com/python/cpython/'
+)
+gh_api = sessions.BaseUrlSession('https://api.github.com/repos/python/cpython/')
 
 paths = (
     'Lib/configparser.py',
@@ -61,8 +65,10 @@ def run(pre=False):
         resp.raise_for_status()
         pathlib.Path(path).write_bytes(resp.content)
     cmd = [
-        'git', 'commit',
+        'git',
+        'commit',
         '-a',
-        '-m', f'cpython-{version} rev={tag["commit"]["sha"][:12]}',
+        '-m',
+        f'cpython-{version} rev={tag["commit"]["sha"][:12]}',
     ]
     subprocess.run(cmd)
