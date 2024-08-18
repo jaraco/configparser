@@ -5,16 +5,17 @@ Sync files from upstream release.
 """
 
 __requires__ = [
-    'autocommand',
-    'requests_toolbelt',
+    'jaraco.ui',
     'packaging',
+    'requests_toolbelt',
 ]
 
 
 import pathlib
 import subprocess
 
-import autocommand
+from jaraco.ui.main import main
+
 import packaging.version
 from requests_toolbelt import sessions
 
@@ -54,8 +55,8 @@ def is_stable(tag):
     return by_tag(tag).is_stable
 
 
-@autocommand.autocommand(__name__)
-def run(pre=False):
+@main
+def run(pre: bool = False):
     tags = gh_api.get('tags').json()
     filtered = tags if pre else filter(is_stable, tags)
     tag = max(filtered, key=by_tag)
