@@ -145,17 +145,18 @@ ConfigParser -- responsible for parsing a list of
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping
+# Do not import dataclasses; overhead is unacceptable (gh-117703)
+
+from collections.abc import Iterable, MutableMapping
 from collections import ChainMap as _ChainMap
 import contextlib
-from dataclasses import dataclass, field
 import functools
 from .compat import io
 import itertools
 import os
 import re
 import sys
-from typing import Iterable
+import types
 
 __all__ = (
     "NoSectionError",
@@ -578,28 +579,25 @@ class ExtendedInterpolation(Interpolation):
                 )
 
 
-@dataclass
 class _ReadState:
-    elements_added: set[str] = field(default_factory=set)
-    cursect: dict[str, str] | None = None
-    sectname: str | None = None
-    optname: str | None = None
-    lineno: int = 0
-    indent_level: int = 0
-    errors: list[ParsingError] = field(default_factory=list)
+    elements_added : set[str]
+    cursect : dict[str, str] | None = None
+    sectname : str | None = None
+    optname : str | None = None
+    lineno : int = 0
+    indent_level : int = 0
+    errors : list[ParsingError]
 
-
-@dataclass
-class _Prefixes:
-    full: Iterable[str]
-    inline: Iterable[str]
+    def __init__(self):
+        self.elements_added = set()
+        self.errors = list()
 
 
 class _Line(str):
     def __new__(cls, val, *args, **kwargs):
         return super().__new__(cls, val)
 
-    def __init__(self, val, prefixes: _Prefixes):
+    def __init__(self, val, prefixes):
         self.prefixes = prefixes
 
     @functools.cached_property
@@ -705,8 +703,9 @@ class RawConfigParser(MutableMapping):
             if allow_no_value:
                 self._optcre = re.compile(self._OPT_NV_TMPL.format(delim=d), re.VERBOSE)
             else:
-                self._optcre = re.compile(self._OPT_TMPL.format(delim=d), re.VERBOSE)
-        self._prefixes = _Prefixes(
+                self._optcre = re.compile(self._OPT_TMPL.format(delim=d),
+                                          re.VERBOSE)
+        self._prefixes = types.SimpleNamespace(
             full=tuple(comment_prefixes or ()),
             inline=tuple(inline_comment_prefixes or ()),
         )
