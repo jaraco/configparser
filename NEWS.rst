@@ -1,3 +1,12 @@
+v7.1.0
+======
+
+Features
+--------
+
+- Refreshed with implementation from CPython main (3.14).
+
+
 v7.0.1
 ======
 
