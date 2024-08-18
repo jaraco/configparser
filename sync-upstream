@@ -5,6 +5,7 @@ Sync files from upstream release.
 """
 
 __requires__ = [
+    'jaraco.context',
     'jaraco.ui',
     'packaging',
     'requests_toolbelt',
@@ -14,9 +15,10 @@ __requires__ = [
 import pathlib
 import subprocess
 
-from jaraco.ui.main import main
-
 import packaging.version
+import requests
+from jaraco.ui.main import main
+from jaraco.context import suppress
 from requests_toolbelt import sessions
 
 
@@ -55,14 +57,30 @@ def is_stable(tag):
     return by_tag(tag).is_stable
 
 
-@main
-def run(pre: bool = False):
+def _latest(pre):
     tags = gh_api.get('tags').json()
     filtered = tags if pre else filter(is_stable, tags)
     tag = max(filtered, key=by_tag)
-    version = tag['name']
+    return tag['name']
+
+
+@suppress(requests.exceptions.HTTPError)
+def ref_info(name):
+    resp = gh_api.get(f'git/refs/{name}')
+    resp.raise_for_status()
+    return resp.json()
+
+
+def resolve(ref):
+    return ref_info(f'heads/{ref}') or ref_info(f'tags/{ref}')
+
+
+@main
+def run(pre: bool = False, ref: str = None):
+    ref = ref or _latest(pre)
+    ob = resolve(ref)
     for path in paths:
-        resp = gh_content.get(f'{version}/{path}')
+        resp = gh_content.get(f'{ref}/{path}')
         resp.raise_for_status()
         pathlib.Path(path).write_bytes(resp.content)
     cmd = [
@@ -70,6 +88,6 @@ def run(pre: bool = False):
         'commit',
         '-a',
         '-m',
-        f'cpython-{version} rev={tag["commit"]["sha"][:12]}',
+        f'cpython-{ref} rev={ob["object"]["sha"][:12]}',
     ]
     subprocess.run(cmd)
