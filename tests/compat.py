@@ -1,4 +1,4 @@
-import test.support
+import test.support  # type: ignore[import-untyped]
 import contextlib
 import sys
 import types
