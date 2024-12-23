@@ -496,7 +496,7 @@ class BasicInterpolation(Interpolation):
                 raise InterpolationSyntaxError(
                     option,
                     section,
-                    "'%%' must be followed by '%%' or '(', " "found: %r" % (rest,),
+                    "'%%' must be followed by '%%' or '(', found: %r" % (rest,),
                 )
 
 
@@ -584,7 +584,7 @@ class ExtendedInterpolation(Interpolation):
                 raise InterpolationSyntaxError(
                     option,
                     section,
-                    "'$' must be followed by '$' or '{', " "found: %r" % (rest,),
+                    "'$' must be followed by '$' or '{', found: %r" % (rest,),
                 )
 
 
@@ -1444,9 +1444,7 @@ class ConverterMapping(MutableMapping):
         try:
             k = 'get' + key
         except TypeError:
-            raise ValueError(
-                'Incompatible key: {} (type: {})' ''.format(key, type(key))
-            )
+            raise ValueError('Incompatible key: {} (type: {})'.format(key, type(key)))
         if k == 'get':
             raise ValueError('Incompatible key: cannot use "" as a name')
         self._data[key] = value

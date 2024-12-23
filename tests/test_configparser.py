@@ -256,8 +256,7 @@ class BasicTestCase(CfgParserTestCaseClass):
         )
         self.assertFalse(
             cf.remove_option('Foo Bar', 'foo'),
-            "remove_option() failed to report non-existence of option"
-            " that was removed",
+            "remove_option() failed to report non-existence of option that was removed",
         )
         self.assertTrue(cf.has_option('Foo Bar', 'this_value'))
         self.assertFalse(cf.remove_option('Foo Bar', 'this_value'))
@@ -331,7 +330,7 @@ boolean {0[0]} NO
   forks {0[0]} spoons
 """.format(self.delimiters, self.comment_prefixes)
         if self.allow_no_value:
-            config_string += "[NoValue]\n" "option-without-value\n"
+            config_string += "[NoValue]\noption-without-value\n"
         cf = self.fromstring(config_string)
         self.basic_test(cf)
         if self.strict:
@@ -385,7 +384,7 @@ boolean {0[0]} NO
             "Spacey Bar From The Beginning": {"foo": "bar3", "baz": "qwe"},
             "Commented Bar": {"foo": "bar4", "baz": "qwe"},
             "Long Line": {
-                "foo": "this line is much, much longer than my editor\nlikes " "it."
+                "foo": "this line is much, much longer than my editor\nlikes it."
             },
             "Section\\with$weird%characters[\t": {},
             "Internationalized Stuff": {
@@ -470,7 +469,7 @@ boolean {0[0]} NO
 
         # SF bug #561822:
         cf = self.fromstring(
-            "[section]\n" "nekey{0}nevalue\n".format(self.delimiters[0]),
+            "[section]\nnekey{0}nevalue\n".format(self.delimiters[0]),
             defaults={"key": "value"},
         )
         self.assertTrue(cf.has_option("section", "Key"))
@@ -516,7 +515,7 @@ boolean {0[0]} NO
 
         # SF bug #561822:
         cf = self.fromstring(
-            "[section]\n" "nekey{0}nevalue\n".format(self.delimiters[0]),
+            "[section]\nnekey{0}nevalue\n".format(self.delimiters[0]),
             defaults={"key": "value"},
         )
         self.assertTrue("Key" in cf["section"])
@@ -540,12 +539,12 @@ boolean {0[0]} NO
         self.parse_error(
             cf,
             configparser.ParsingError,
-            "[Foo]\n" "{0}val-without-opt-name\n".format(self.delimiters[0]),
+            "[Foo]\n{0}val-without-opt-name\n".format(self.delimiters[0]),
         )
         self.parse_error(
             cf,
             configparser.ParsingError,
-            "[Foo]\n" "{0}val-without-opt-name\n".format(self.delimiters[1]),
+            "[Foo]\n{0}val-without-opt-name\n".format(self.delimiters[1]),
         )
         e = self.parse_error(
             cf, configparser.MissingSectionHeaderError, "No Section!\n"
@@ -588,7 +587,7 @@ boolean {0[0]} NO
         )
         self.assertFalse(
             cf.has_section("Foo"),
-            "new ConfigParser should have no acknowledged " "sections",
+            "new ConfigParser should have no acknowledged sections",
         )
         with self.assertRaises(configparser.NoSectionError):
             cf.options("Foo")
@@ -714,7 +713,7 @@ boolean {0[0]} NO
             )
         )
         if self.allow_no_value:
-            config_string += "[Valueless]\n" "option-without-value\n"
+            config_string += "[Valueless]\noption-without-value\n"
 
         cf = self.fromstring(config_string)
         for space_around_delimiters in (True, False):
@@ -740,13 +739,11 @@ boolean {0[0]} NO
                 "\n".format(equals=delimiter, default_section=self.default_section)
             )
             if self.allow_no_value:
-                expect_string += "[Valueless]\n" "option-without-value\n" "\n"
+                expect_string += "[Valueless]\noption-without-value\n\n"
             self.assertEqual(output.getvalue(), expect_string)
 
     def test_set_string_types(self):
-        cf = self.fromstring(
-            "[sect]\n" "option1{eq}foo\n".format(eq=self.delimiters[0])
-        )
+        cf = self.fromstring("[sect]\noption1{eq}foo\n".format(eq=self.delimiters[0]))
         # Check that we don't get an exception when setting values in
         # an existing section using strings:
 
@@ -1010,9 +1007,7 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
             self.assertEqual(cf.get("section", "not_ok"), "xxx/xxx/%s")
 
     def test_set_malformatted_interpolation(self):
-        cf = self.fromstring(
-            "[sect]\n" "option1{eq}foo\n".format(eq=self.delimiters[0])
-        )
+        cf = self.fromstring("[sect]\noption1{eq}foo\n".format(eq=self.delimiters[0]))
 
         self.assertEqual(cf.get('sect', "option1"), "foo")
 
@@ -1027,9 +1022,7 @@ class ConfigParserTestCase(BasicTestCase, unittest.TestCase):
         self.assertEqual(cf.get("sect", "option2"), "foo%bar")
 
     def test_set_nonstring_types(self):
-        cf = self.fromstring(
-            "[sect]\n" "option1{eq}foo\n".format(eq=self.delimiters[0])
-        )
+        cf = self.fromstring("[sect]\noption1{eq}foo\n".format(eq=self.delimiters[0]))
         # Check that we get a TypeError when setting non-string values
         # in an existing section:
         self.assertRaises(TypeError, cf.set, "sect", "option1", 1)
@@ -1437,7 +1430,7 @@ class ConfigParserTestCaseTrickyFile(CfgParserTestCaseClass, unittest.TestCase):
             [
                 'strange',
                 'corruption',
-                'yeah, sections can be ' 'indented as well',
+                'yeah, sections can be indented as well',
                 'another one!',
                 'no values here',
                 'tricky interpolation',
@@ -1505,14 +1498,12 @@ class SortedTestCase(RawConfigParserTestCase):
     dict_type = SortedDict
 
     def test_sorted(self):
-        cf = self.fromstring(
-            "[b]\n" "o4=1\n" "o3=2\n" "o2=3\n" "o1=4\n" "[a]\n" "k=v\n"
-        )
+        cf = self.fromstring("[b]\no4=1\no3=2\no2=3\no1=4\n[a]\nk=v\n")
         output = io.StringIO()
         cf.write(output)
         self.assertEqual(
             output.getvalue(),
-            "[a]\n" "k = v\n\n" "[b]\n" "o1 = 4\n" "o2 = 3\n" "o3 = 2\n" "o4 = 1\n\n",
+            "[a]\nk = v\n\n[b]\no1 = 4\no2 = 3\no3 = 2\no4 = 1\n\n",
         )
 
 
@@ -1636,7 +1627,7 @@ class ReadFileTestCase(unittest.TestCase):
             parser.read_file(lines, source=b"badbad")
         self.assertEqual(
             nice_literals(str(dse.exception)),
-            "While reading from 'badbad' [line  2]: section 'badbad' " "already exists",
+            "While reading from 'badbad' [line  2]: section 'badbad' already exists",
         )
         lines = (
             textwrap.dedent(
@@ -1690,7 +1681,7 @@ class ReadFileTestCase(unittest.TestCase):
             parser.read_file(lines, source=b"badbad")
         self.assertEqual(
             nice_literals(str(dse.exception)),
-            "File contains no section headers.\nfile: 'badbad', line: 1\n" "'[badbad'",
+            "File contains no section headers.\nfile: 'badbad', line: 1\n'[badbad'",
         )
 
     def test_keys_without_value_with_extra_whitespace(self):
@@ -1728,9 +1719,7 @@ class CoverageOneHundredTestCase(unittest.TestCase):
         self.assertEqual(error.args, ('section', 'option', None, None))
         self.assertEqual(
             str(error),
-            "Option {0!r} in section {1!r} already " "exists".format(
-                'option', 'section'
-            ),
+            "Option {0!r} in section {1!r} already exists".format('option', 'section'),
         )
 
     def test_interpolation_depth_error(self):
@@ -1761,13 +1750,13 @@ class CoverageOneHundredTestCase(unittest.TestCase):
             parser['section']['invalid_percent']
         self.assertEqual(
             str(cm.exception),
-            "'%' must be followed by '%' or " "'(', found: {0!r}".format('%'),
+            "'%' must be followed by '%' or '(', found: {0!r}".format('%'),
         )
         with self.assertRaises(configparser.InterpolationSyntaxError) as cm:
             parser['section']['invalid_reference']
         self.assertEqual(
             str(cm.exception),
-            "bad interpolation variable " "reference {0!r}".format('%(()'),
+            "bad interpolation variable reference {0!r}".format('%(()'),
         )
 
     def test_sectionproxy_repr(self):
