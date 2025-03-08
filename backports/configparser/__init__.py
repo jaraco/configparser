@@ -145,18 +145,19 @@ ConfigParser -- responsible for parsing a list of
 
 from __future__ import annotations
 
-# Do not import dataclasses; overhead is unacceptable (gh-117703)
-
-from collections.abc import Iterable, MutableMapping
-from collections import ChainMap as _ChainMap
 import contextlib
 import functools
-from .compat import io
 import itertools
 import os
 import re
 import sys
 import types
+from collections import ChainMap as _ChainMap
+
+# Do not import dataclasses; overhead is unacceptable (gh-117703)
+from collections.abc import Iterable, MutableMapping
+
+from .compat import io
 
 __all__ = (
     "NoSectionError",
@@ -342,7 +343,7 @@ class ParsingError(Error):
         return self
 
     @staticmethod
-    def _raise_all(exceptions: Iterable['ParsingError']):
+    def _raise_all(exceptions: Iterable[ParsingError]):
         """
         Combine any number of ParsingErrors into one and raise it.
         """

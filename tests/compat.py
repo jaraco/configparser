@@ -1,8 +1,9 @@
-import test.support  # type: ignore[import-untyped, unused-ignore, import-not-found]
 import contextlib
+import pathlib
 import sys
 import types
-import pathlib
+
+import test.support  # type: ignore[import-untyped, unused-ignore, import-not-found]
 
 
 def check__all__(*args, **kwargs):

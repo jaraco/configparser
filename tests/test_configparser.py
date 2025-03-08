@@ -3,12 +3,11 @@ import io
 import os
 import textwrap
 import unittest
-
-from typing import Type, Iterable
-
-from .compat import support, os_helper
+from collections.abc import Iterable
 
 from backports import configparser
+
+from .compat import os_helper, support
 
 
 def nice_literals(str):
@@ -44,7 +43,7 @@ class CfgParserTestCaseClass:
     comment_prefixes: Iterable[str] = (';', '#')
     inline_comment_prefixes: Iterable[str] = (';', '#')
     empty_lines_in_values = True
-    dict_type: Type[collections.abc.Mapping] = configparser._default_dict
+    dict_type: type[collections.abc.Mapping] = configparser._default_dict
     strict = False
     default_section = configparser.DEFAULTSECT
     interpolation = configparser._UNSET
