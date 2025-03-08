@@ -1,4 +1,5 @@
 import io as _io
+import sys
 import types
 
 
@@ -16,4 +17,6 @@ def copy_module(mod, **defaults):
     return copy
 
 
-io = copy_module(_io, text_encoding=text_encoding)
+io = (
+    copy_module(_io, text_encoding=text_encoding) if sys.version_info < (3, 10) else _io
+)

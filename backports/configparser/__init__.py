@@ -156,7 +156,7 @@ from collections import ChainMap as _ChainMap
 # Do not import dataclasses; overhead is unacceptable (gh-117703)
 from collections.abc import Iterable, MutableMapping
 
-from .compat import io
+from .compat.py39 import io
 
 __all__ = (
     "NoSectionError",
