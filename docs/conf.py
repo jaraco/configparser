@@ -57,6 +57,6 @@ extlinks = {
 }
 extensions += ['sphinx.ext.extlinks']
 
-# local
-
 extensions += ['jaraco.tidelift']
+
+# local
