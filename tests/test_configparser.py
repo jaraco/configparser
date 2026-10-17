@@ -1586,7 +1586,8 @@ class ReadFileTestCase(unittest.TestCase):
 
     def test_iterable(self):
         lines = (
-            textwrap.dedent(
+            textwrap
+            .dedent(
                 """
         [Foo Bar]
         foo=newbar"""
@@ -1613,7 +1614,8 @@ class ReadFileTestCase(unittest.TestCase):
     def test_source_as_bytes(self):
         """Issue #18260."""
         lines = (
-            textwrap.dedent(
+            textwrap
+            .dedent(
                 """
         [badbad]
         [badbad]"""
@@ -1629,7 +1631,8 @@ class ReadFileTestCase(unittest.TestCase):
             "While reading from 'badbad' [line  2]: section 'badbad' already exists",
         )
         lines = (
-            textwrap.dedent(
+            textwrap
+            .dedent(
                 """
         [badbad]
         bad = bad
@@ -1651,7 +1654,8 @@ class ReadFileTestCase(unittest.TestCase):
             "'badbad' already exists",
         )
         lines = (
-            textwrap.dedent(
+            textwrap
+            .dedent(
                 """
         [badbad]
         = bad"""
@@ -1667,7 +1671,8 @@ class ReadFileTestCase(unittest.TestCase):
             "Source contains parsing errors: 'badbad'\n\t[line  2]: '= bad'",
         )
         lines = (
-            textwrap.dedent(
+            textwrap
+            .dedent(
                 """
         [badbad
         bad = bad"""

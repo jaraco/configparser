@@ -10,7 +10,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
         cp = configparser.ConfigParser(allow_no_value=True)
         cp.add_section("section")
         self.assertIsInstance(cp.sections()[0], str)
-        self.assertIsInstance([sect for sect in cp][0], str)
+        self.assertIsInstance(next(iter(cp)), str)
         cp.set("section", "nothing", None)
         self.assertIsAlright(cp, None)
 
@@ -18,7 +18,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
         cp = configparser.ConfigParser(allow_no_value=True)
         cp["section"] = {}
         self.assertIsInstance(cp.sections()[0], str)
-        self.assertIsInstance([sect for sect in cp][0], str)
+        self.assertIsInstance(next(iter(cp)), str)
         cp["section"]["nothing"] = None
         self.assertIsAlright(cp, None)
 
@@ -31,7 +31,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
         cp = configparser.ConfigParser()
         cp.add_section("section")
         self.assertIsInstance(cp.sections()[0], str)
-        self.assertIsInstance([sect for sect in cp][0], str)
+        self.assertIsInstance(next(iter(cp)), str)
         cp.set("section", "nothing", "nada")
         self.assertIsAlright(cp, "nada")
 
@@ -39,7 +39,7 @@ class UnicodeBackportTestCase(unittest.TestCase):
         cp = configparser.ConfigParser()
         cp["section"] = {}
         self.assertIsInstance(cp.sections()[0], str)
-        self.assertIsInstance([sect for sect in cp][0], str)
+        self.assertIsInstance(next(iter(cp)), str)
         cp["section"]["nothing"] = "nada"
         self.assertIsAlright(cp, "nada")
 
@@ -68,6 +68,6 @@ class UnicodeBackportTestCase(unittest.TestCase):
         self.assertIsInstance(cp.sections()[0], str)
         self.assertIsInstance(cp.options('section')[0], str)
         self.assertEqual(cp.get('section', 'nothing'), optvalue)
-        self.assertIsInstance([sect for sect in cp][0], str)
-        self.assertIsInstance([opt for opt in cp['section']][0], str)
+        self.assertIsInstance(next(iter(cp)), str)
+        self.assertIsInstance(next(iter(cp['section'])), str)
         self.assertEqual(cp['section']['nothing'], optvalue)
