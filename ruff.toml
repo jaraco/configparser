@@ -63,3 +63,25 @@ allow-dict-calls-with-keyword-arguments = true
 preview = true
 # https://docs.astral.sh/ruff/settings/#format_quote-style
 quote-style = "preserve"
+
+[lint.per-file-ignores]
+# local
+# These modules are derived from CPython and periodically merged from the
+# cpython branch. Keep them close to upstream rather than modernizing them.
+# Ref jaraco/skeleton#210.
+"backports/configparser/__init__.py" = [
+	"C4", # flake8-comprehensions
+	"RUF012", # mutable-class-default
+	"RUF019", # unnecessary-key-check
+	"RUF022", # unsorted-dunder-all
+	"RUF059", # unused-unpacked-variable
+	"SIM102", # collapsible-if
+	"UP008", # super-call-with-parameters
+	"UP03", # printf-string-formatting, format-literals, f-string
+]
+"tests/test_configparser.py" = [
+	"C4", # flake8-comprehensions
+	"RUF012", # mutable-class-default
+	"SIM117", # multiple-with-statements
+	"UP03", # printf-string-formatting, format-literals, f-string
+]
