@@ -1,3 +1,13 @@
+v7.3.0
+======
+
+Features
+--------
+
+- Refreshed with implementation from CPython 3.15.0.
+- Require Python 3.11 or later.
+
+
 v7.2.0
 ======
 
