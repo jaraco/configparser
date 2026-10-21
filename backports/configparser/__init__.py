@@ -147,6 +147,7 @@ from __future__ import annotations
 
 import contextlib
 import functools
+import io
 import itertools
 import os
 import re
@@ -155,8 +156,6 @@ from collections import ChainMap as _ChainMap
 
 # Do not import dataclasses; overhead is unacceptable (gh-117703)
 from collections.abc import Iterable, MutableMapping
-
-from .compat.py39 import io
 
 __all__ = (
     "NoSectionError",
